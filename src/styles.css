@@ -427,6 +427,7 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 .ws-actions { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); }
 .ws-actions #ws-print { grid-column: 1 / -1; min-height: 50px; font-size: 1rem; }
 .ws-actions .btn { width: 100%; padding-left: 10px; padding-right: 10px; }
+.ws-actions #ws-pin { grid-column: 1 / -1; }
 .seed { display: flex; gap: 8px; align-items: baseline; font-size: .8125rem; color: var(--muted); margin: var(--s4) 0 0; line-height: 1.5; }
 .seed #ws-seed { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 .status { grid-column: 1 / -1; min-height: 1.4em; margin: 2px 0 0; font-size: .875rem; font-weight: 500; color: var(--success); }
@@ -465,6 +466,7 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
     border-top: 1px solid var(--border); box-shadow: 0 -8px 24px -12px rgba(15, 23, 42, .18);
   }
   .ws-actions #ws-print { grid-column: auto; min-height: 48px; font-size: .9375rem; }
+  .ws-actions #ws-pin { display: none; }
   .ws-actions .btn { min-height: 48px; font-size: .875rem; gap: 6px; }
   .hide-sm { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .status {
