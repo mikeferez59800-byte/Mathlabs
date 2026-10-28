@@ -50,18 +50,52 @@ function validateCatalog() {
 
 // ---------- assets ----------
 function buildAssets() {
-  const css = fs.readFileSync(path.join(ROOT, 'src/styles.css'), 'utf8');
-  const js = fs.readFileSync(path.join(ROOT, 'src/engine.js'), 'utf8') + '\n' + fs.readFileSync(path.join(ROOT, 'src/app.js'), 'utf8');
+  const font = fs.readFileSync(path.join(ROOT, 'src/fonts/inter-latin-wght-normal.woff2'));
+  const fontName = `/assets/inter.${crypto.createHash('sha256').update(font).digest('hex').slice(0, 10)}.woff2`;
+  write(fontName, font);
+  const css = fs.readFileSync(path.join(ROOT, 'src/styles.css'), 'utf8').replace('__INTER_WOFF2__', fontName);
+  const js = ['src/engine.js', 'src/app.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const ui = fs.readFileSync(path.join(ROOT, 'src/ui.js'), 'utf8');
   const cssName = `/assets/styles.${hash(css)}.css`;
   const jsName = `/assets/app.${hash(js)}.js`;
+  const uiName = `/assets/ui.${hash(ui)}.js`;
   write(cssName, css);
   write(jsName, js);
+  write(uiName, ui);
   write('/favicon.svg', FAVICON);
-  return { css: cssName, js: jsName };
+  return { css: cssName, js: jsName, ui: uiName, font: fontName };
 }
 
-const FAVICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2f5bea"/><path d="M18 22h12M24 16v12M36 22h12M19 42l10 10M29 42L19 52M36 44h12M36 50h12" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>';
-const LOGO = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#2f5bea"/><path d="M18 22h12M24 16v12M36 22h12M19 42l10 10M29 42L19 52M36 44h12M36 50h12" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>';
+const LOGO_MARK = (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>` +
+  `<rect width="64" height="64" rx="16" fill="url(#${id})"/><path d="M18 22h12M24 16v12M36 22h12M19 42l10 10M29 42L19 52M36 44h12M36 50h12" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`;
+const FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${LOGO_MARK('g')}</svg>`;
+const LOGO = (id) => `<svg viewBox="0 0 64 64" aria-hidden="true">${LOGO_MARK(id)}</svg>`;
+
+// 24px line icons (stroke = currentColor).
+const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const CAT_ICONS = {
+  addition: '<path d="M12 5v14M5 12h14"/>',
+  subtraction: '<path d="M5 12h14"/>',
+  multiplication: '<path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/>',
+  division: '<path d="M5 12h14"/><circle cx="12" cy="6.5" r="1.3" fill="currentColor"/><circle cx="12" cy="17.5" r="1.3" fill="currentColor"/>',
+  fractions: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>',
+  decimals: '<circle cx="5" cy="17.5" r="1.2" fill="currentColor"/><rect x="8.5" y="5" width="5" height="13" rx="2.5"/><rect x="15.5" y="5" width="5" height="13" rx="2.5"/>',
+  'number-sense': '<path d="M3 15h18M6 12v6M12 12v6M18 12v6"/><path d="m9 7 3-3 3 3"/>',
+  'pre-algebra': '<path d="M7 4c-2 2.5-3 5-3 8s1 5.5 3 8M17 4c2 2.5 3 5 3 8s-1 5.5-3 8"/><path d="m9 9 6 6M15 9l-6 6"/>'
+};
+const ICON = {
+  arrow: '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  check: svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  menu: '<svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  close: '<svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  key: svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m9 15 2 2 4-4"/>'),
+  infinite: svg('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>'),
+  link: svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'),
+  shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'),
+  sliders: svg('<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'),
+  grad: svg('<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>')
+};
+const catIcon = (slug) => svg(CAT_ICONS[slug] || CAT_ICONS.addition);
 
 // ---------- ads ----------
 const adsOn = config.ads.enabled && /^ca-pub-\d{10,20}$/.test(config.ads.client);
@@ -76,14 +110,14 @@ function adSlot(name) {
 }
 
 // ---------- layout ----------
-function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true }) {
+function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true, bodyClass = '' }) {
   const canonical = abs(pathName);
   const headExtra = [];
   if (config.googleSiteVerification) headExtra.push(`<meta name="google-site-verification" content="${esc(config.googleSiteVerification)}">`);
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) headExtra.push(`<meta name="google-adsense-account" content="${esc(config.ads.client)}">`);
   if (adsOn) headExtra.push(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(config.ads.client)}" crossorigin="anonymous"></script>`);
   const ld = jsonld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('');
-  const nav = categories.slice(0, 4).map((c) => `<a class="nav-cat" href="/${c.slug}/"${pathName.startsWith('/' + c.slug + '/') ? ' aria-current="page"' : ''}>${esc(c.name)}</a>`).join('');
+  const nav = categories.map((c) => `<li><a href="/${c.slug}/"${pathName.startsWith('/' + c.slug + '/') ? ' aria-current="page"' : ''}>${esc(c.name)}</a></li>`).join('');
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -99,22 +133,27 @@ ${noindex ? '<meta name="robots" content="noindex">' : ''}
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(canonical)}">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#2f5bea">
+<meta name="theme-color" content="#0B1020">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="${assets.font}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${assets.css}">
+<script>document.documentElement.classList.add('js')</script>
 ${headExtra.join('\n')}
 ${ld}
 </head>
-<body>
+<body${bodyClass ? ` class="${bodyClass}"` : ''}>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="logo" href="/">${LOGO}<span>${esc(config.name)}</span></a>
-<nav class="nav" aria-label="Main">${nav}<a href="/#all"${pathName === '/' ? ' aria-current="page"' : ''}>All worksheets</a></nav>
+<header class="site-head" id="site-head"><div class="wrap head-row">
+<a class="logo" href="/" aria-label="${esc(config.name)} home">${LOGO('lg-h')}<span>MathSheet<b>Lab</b></span></a>
+<nav class="nav" id="site-nav" aria-label="Main"><ul>${nav}</ul></nav>
+<a class="btn btn-primary btn-sm head-cta" href="/#all">All worksheets</a>
+<button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span class="visually-hidden">Menu</span>${ICON.menu}${ICON.close}</button>
 </div></header>
-<main id="main" class="wrap">
+<main id="main">
 ${body}
 </main>
 ${footer()}
+<script src="${assets.ui}" defer></script>
 ${scripts ? `<script src="${assets.js}" defer></script>` : ''}
 </body>
 </html>
@@ -127,7 +166,8 @@ function footer() {
     ['More worksheets', categories.slice(4)]
   ].map(([h, cats]) => `<div><h2>${h}</h2><ul>${cats.map((c) => `<li><a href="/${c.slug}/">${esc(c.name)}</a></li>`).join('')}</ul></div>`).join('');
   const privacyBtn = adsOn ? '<li><button type="button" class="linklike" onclick="(window.googlefc=window.googlefc||{}).callbackQueue=(window.googlefc.callbackQueue||[]);googlefc.callbackQueue.push(googlefc.showRevocationMessage)">Privacy &amp; cookie settings</button></li>' : '';
-  return `<footer class="site-foot"><div class="wrap">
+  return `<footer class="site-foot dark"><div class="glow" aria-hidden="true"></div><div class="wrap foot-grid">
+<div class="foot-brand"><a class="logo" href="/">${LOGO('lg-f')}<span>MathSheet<b>Lab</b></span></a><p>${esc(config.tagline)}. Answer keys included, no sign-up.</p></div>
 ${cols}
 <div><h2>Site</h2><ul><li><a href="/about/">About</a></li><li><a href="/contact/">Contact</a></li><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="/legal/">Legal notice</a></li>${privacyBtn}</ul></div>
 <p class="foot-note">Worksheets are generated in your browser and may be printed and copied freely for personal, home-school and classroom use. © ${new Date().getFullYear()} ${esc(config.name)}.</p>
@@ -144,48 +184,144 @@ function crumbs(items) {
   return { html, ld };
 }
 
-function card(t) {
+function card(t, i = 0) {
   const search = [t.h1, t.title, t.grade, catBySlug[t.cat].name, t.slug.replace(/-/g, ' ')].join(' ').toLowerCase();
-  return `<li class="card" data-search="${esc(search)}"><a class="stretch" href="${typeUrl(t)}">${esc(t.h1)}</a><p>${esc(t.intro[0].split('. ')[0])}.</p><span class="grade">${esc(t.grade)}</span></li>`;
+  return `<li class="card reveal" style="--d:${i % 4}" data-search="${esc(search)}"><a class="stretch" href="${typeUrl(t)}">${esc(t.h1)}</a><p>${esc(t.intro[0].split('. ')[0])}.</p><span class="grade">${esc(t.grade)}</span></li>`;
+}
+
+function clientTypeOf(t) {
+  return { slug: t.slug, gen: t.gen, params: t.params, cols: t.cols, counts: t.counts, count: t.count, h1: t.h1, sheetTitle: t.h1.charAt(0).toUpperCase() + t.h1.slice(1), instruction: t.instruction };
+}
+
+// A real sheet from the engine (same output as the generator page), used as an illustration.
+function sampleSheets(slug, count, withKey) {
+  const ct = clientTypeOf(typeBySlug[slug]);
+  const seed = MSL.hashString(ct.slug);
+  const problems = MSL.generate(ct, seed, count);
+  const opts = { seed, siteName: config.name, cols: ct.cols, title: ct.sheetTitle };
+  return { seed, sheet: MSL.renderSheet(ct, problems, opts), key: withKey ? MSL.renderSheet(ct, problems, { ...opts, answers: true }) : '' };
+}
+
+function catCard(c, i = 0) {
+  const n = types.filter((t) => t.cat === c.slug).length;
+  return `<li class="cat-card reveal" style="--d:${i % 4}"><span class="cat-icon">${catIcon(c.slug)}</span><h3><a class="stretch" href="/${c.slug}/">${esc(c.name)}</a></h3><p>${esc(c.blurb)}</p><span class="cat-count">${n} worksheets ${ICON.arrow}</span></li>`;
+}
+
+// "Grade 3 – Grade 4" / "Kindergarten – Grade 1" → overall range of a list, e.g. "K–Grade 4".
+function gradeRange(list) {
+  const nums = list.flatMap((t) => (t.grade.match(/Kindergarten|\d+/g) || []).map((g) => (g === 'Kindergarten' ? 0 : +g)));
+  const lo = Math.min(...nums), hi = Math.max(...nums);
+  if (lo === hi) return lo === 0 ? 'Kindergarten' : `Grade ${lo}`;
+  return lo === 0 ? `K–Grade ${hi}` : `Grades ${lo}–${hi}`;
 }
 
 // ---------- pages ----------
 function homePage(assets) {
+  const front = sampleSheets('multiplication-table-of-7', 15);
+  const stack = `<div class="hero-visual no-print" aria-hidden="true"><div class="stack">
+<div class="stack-card c3">${sampleSheets('long-division-no-remainder', 6).sheet}</div>
+<div class="stack-card c2">${sampleSheets('adding-fractions-like-denominators', 9).sheet}</div>
+<div class="stack-card c1">${front.sheet}</div>
+<span class="stack-tag t2">Worksheet #${front.seed}</span>
+<span class="stack-tag t1"><span class="ok">${ICON.check}</span>Answer key included</span>
+</div></div>`;
+
+  const catCards = categories.map(catCard).join('');
+
+  const demo = sampleSheets('three-digit-addition', 12, true);
   const groups = categories.map((c) => {
     const list = types.filter((t) => t.cat === c.slug);
-    return `<section data-group aria-labelledby="g-${c.slug}"><div class="cat-head"><h2 id="g-${c.slug}">${esc(c.name)}</h2><a href="/${c.slug}/">All ${list.length} ${esc(c.name.toLowerCase())} worksheets</a></div><ul class="cards">${list.map(card).join('')}</ul></section>`;
+    return `<section class="group" data-group aria-labelledby="g-${c.slug}"><div class="cat-head"><h2 id="g-${c.slug}">${catIcon(c.slug)}${esc(c.name)}</h2><a href="/${c.slug}/">All ${list.length} ${esc(c.name.toLowerCase())} worksheets</a></div><ul class="cards">${list.map(card).join('')}</ul></section>`;
   }).join('\n');
+
+  const benefits = [
+    [ICON.key, 'Answer key with every sheet', 'The answer key prints on a separate page, computed by the same rules as the problems.'],
+    [ICON.infinite, 'Unlimited fresh sheets', 'Press New problems as often as you like for a different sheet. No limit and no account.'],
+    [ICON.link, 'Share the exact sheet', 'Every sheet has a number, for example #482913. Its link always opens exactly the same problems, handy for a whole class.'],
+    [ICON.shield, 'Private, nothing to install', 'Problems are generated in your browser. Nothing you type is sent to a server, and there is no sign-up or email.']
+  ].map(([icon, h, p], i) => `<li class="benefit reveal" style="--d:${i}"><span class="b-icon">${icon}</span><h3>${h}</h3><p>${p}</p></li>`).join('');
+
   const body = `
-<section class="hero">
-<h1>Free printable math worksheets</h1>
-<p class="lead">Choose a skill, get a fresh worksheet instantly, then print it or save it as a PDF. Every sheet comes with an answer key. No sign-up, no email, nothing to install.</p>
-<ul class="badges"><li>${types.length} worksheet types</li><li>Kindergarten to grade 7</li><li>Unlimited random sheets</li><li>Answer keys</li></ul>
+<section class="hero dark" aria-labelledby="hero-h">
+<div class="glow" aria-hidden="true"></div><div class="glow glow-2" aria-hidden="true"></div>
+<div class="wrap hero-grid">
+<div class="hero-copy">
+<p class="eyebrow"><span class="pill">Free</span>Printable math worksheets · K–Grade 7</p>
+<h1 id="hero-h">Beautiful math worksheets. <span class="grad-text">Made in seconds.</span></h1>
+<p class="lead">Create, customize and print free math worksheets with answer keys, from kindergarten to grade 7.</p>
+<div class="hero-actions"><a class="btn btn-primary btn-lg" href="#all">Browse all ${types.length} worksheets ${ICON.arrow}</a><a class="btn btn-ghost btn-lg" href="/multiplication/multiplication-facts-0-12/">Try the times tables</a></div>
+<ul class="hero-facts"><li>${ICON.check}${types.length} worksheet types</li><li>${ICON.check}Answer keys</li><li>${ICON.check}No sign-up</li></ul>
+</div>
+${stack}
+</div>
 </section>
+
+<section class="section" aria-labelledby="cats-h">
+<div class="wrap">
+<div class="section-head reveal"><p class="kicker">Browse by topic</p><h2 id="cats-h">Every core skill, from first sums to pre‑algebra</h2><p>${categories.length} topics and ${types.length} focused generators. Each one makes a new printable sheet in one click.</p></div>
+<ul class="cat-grid">${catCards}</ul>
+</div>
+</section>
+
+<section class="section demo dark" aria-labelledby="how-h">
+<div class="glow" aria-hidden="true"></div>
+<div class="wrap demo-grid">
+<div>
+<div class="section-head reveal"><p class="kicker">How it works</p><h2 id="how-h">From skill to printed sheet in three steps</h2></div>
+<ol class="steps">
+<li class="reveal" style="--d:0"><h3>Pick a skill</h3><p>Each worksheet page focuses on one precise skill and has its own generator.</p></li>
+<li class="reveal" style="--d:1"><h3>Set the options</h3><p>Choose the number of problems, a title, US Letter or A4, large print and the answer key. Press <strong>New problems</strong> for a different sheet.</p></li>
+<li class="reveal" style="--d:2"><h3>Print or save as PDF</h3><p>Press <strong>Print / Save as PDF</strong>. Only the worksheet prints, and the answer key comes out on its own page.</p></li>
+</ol>
+<a class="btn btn-primary" href="/addition/three-digit-addition/">Open this generator ${ICON.arrow}</a>
+</div>
+<div class="demo-visual no-print" aria-hidden="true">
+<figure class="demo-paper reveal" style="--d:1"><div class="frame">${demo.sheet}</div><figcaption><b>Worksheet</b> · page 1</figcaption></figure>
+<figure class="demo-paper reveal" style="--d:2"><div class="frame">${demo.key}</div><figcaption><b>Answer key</b> · page 2</figcaption></figure>
+</div>
+</div>
+</section>
+
+<section class="section" aria-labelledby="why-h">
+<div class="wrap">
+<div class="section-head reveal"><p class="kicker">Why teachers and parents use it</p><h2 id="why-h">Simple, free and made for the classroom</h2></div>
+<ul class="benefits">${benefits}</ul>
+</div>
+</section>
+
+<section class="section all" id="all" aria-labelledby="all-h">
+<div class="wrap">
+<div class="all-head"><div class="section-head"><p class="kicker">All worksheets</p><h2 id="all-h">Find the right worksheet</h2></div>
 <div class="search" role="search"><label for="ws-search" class="visually-hidden">Search worksheets</label>
 <input id="ws-search" type="search" placeholder="Search: fractions, 7 times table, long division…" autocomplete="off">
-<p class="search-meta" id="ws-search-count" aria-live="polite"></p></div>
+<p class="search-meta" id="ws-search-count" aria-live="polite"></p></div></div>
 <p id="ws-search-empty" hidden>No worksheet matches your search. Try a simpler word such as “addition” or “fractions”.</p>
-<div id="all">${groups}</div>
-<section class="content"><h2>How it works</h2>
-<p>Each worksheet page has a generator. Pick the number of problems and options, press <strong>New problems</strong> for a different sheet, and <strong>Print / Save as PDF</strong> to print it. The answer key prints on a separate page.</p>
-<p>Every sheet has a number (for example #482913). The page address contains that number, so sharing or bookmarking the link always opens exactly the same problems, which is handy for a whole class.</p>
-<p>Problems are generated in your browser. Nothing you type is sent to a server.</p></section>`;
+<div>${groups}</div>
+</div>
+</section>`;
   const ld = [{
     '@context': 'https://schema.org', '@type': 'WebSite', name: config.name, url: abs('/'), description: config.tagline, inLanguage: 'en'
   }];
   return layout(assets, {
     title: `Free Printable Math Worksheets With Answer Keys | ${config.name}`,
     desc: `Generate free printable math worksheets: addition, subtraction, times tables, long division, fractions, decimals and more. Answer keys, unlimited sheets, no sign-up.`,
-    pathName: '/', body, jsonld: ld
+    pathName: '/', body, jsonld: ld, bodyClass: 'home'
   });
 }
 
 function categoryPage(assets, c) {
   const list = types.filter((t) => t.cat === c.slug);
   const bc = crumbs([{ name: 'Home', path: '/' }, { name: c.name, path: `/${c.slug}/` }]);
-  const body = `${bc.html}
-<section class="ws-intro"><h1>${esc(c.name)} worksheets</h1><p class="lead">${esc(c.blurb)} All ${list.length} worksheets below are free to print, generate new problems every time and include an answer key.</p></section>
-<ul class="cards">${list.map(card).join('')}</ul>`;
+  const others = categories.filter((x) => x.slug !== c.slug);
+  const body = `<section class="page-head dark ws-intro"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
+<div class="title-row"><span class="head-icon" aria-hidden="true">${catIcon(c.slug)}</span><h1>${esc(c.name)} worksheets</h1></div>
+<ul class="chips meta" aria-label="About these worksheets"><li>${ICON.grad}${esc(gradeRange(list))}</li><li>${list.length} worksheets</li><li>Free</li><li>Answer keys included</li></ul>
+<p class="lead">${esc(c.blurb)} All ${list.length} worksheets below are free to print, generate new problems every time and include an answer key.</p></div></section>
+<div class="wrap page-body"><ul class="cards">${list.map(card).join('')}</ul></div>
+<section class="section other-topics" aria-labelledby="other-h"><div class="wrap">
+<div class="section-head reveal"><p class="kicker">Keep practicing</p><h2 id="other-h">Other topics</h2></div>
+<ul class="cat-grid">${others.map(catCard).join('')}</ul>
+</div></section>`;
   const ld = [bc.ld, {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${c.name} worksheets`, url: abs(`/${c.slug}/`),
     hasPart: list.map((t) => ({ '@type': 'LearningResource', name: t.h1, url: abs(typeUrl(t)) }))
@@ -200,7 +336,7 @@ function categoryPage(assets, c) {
 function worksheetPage(assets, t) {
   const c = catBySlug[t.cat];
   const seed = MSL.hashString(t.slug);
-  const clientType = { slug: t.slug, gen: t.gen, params: t.params, cols: t.cols, counts: t.counts, count: t.count, h1: t.h1, sheetTitle: t.h1.charAt(0).toUpperCase() + t.h1.slice(1), instruction: t.instruction };
+  const clientType = clientTypeOf(t);
   const problems = MSL.generate(clientType, seed, t.count);
   const sheetOpts = { seed, siteName: config.name, cols: t.cols, title: clientType.sheetTitle };
   const sheets = MSL.renderSheet(clientType, problems, sheetOpts) + MSL.renderSheet(clientType, problems, { ...sheetOpts, answers: true });
@@ -209,37 +345,47 @@ function worksheetPage(assets, t) {
   const related = (t.related || []).map((s) => typeBySlug[s]);
   const icon = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 
-  const body = `${bc.html}
-<section class="ws-intro">
+  const body = `<section class="page-head dark ws-intro has-panel"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
 <h1>${esc(t.h1.charAt(0).toUpperCase() + t.h1.slice(1))}</h1>
-<p class="meta">Level: ${esc(t.grade)} · Free · Printable · Answer key included</p>
-<p>${esc(t.intro[0])}</p>
-</section>
-<div class="ws-layout">
+<ul class="chips meta" aria-label="About this worksheet"><li>${ICON.grad}Level: ${esc(t.grade)}</li><li>Free</li><li>Printable</li><li>Answer key included</li></ul>
+<p class="lead">${esc(t.intro[0])}</p>
+</div></section>
+<div class="workspace"><div class="wrap ws-layout">
 <aside class="panel ws-controls" aria-labelledby="opts-h">
-<h2 id="opts-h" class="visually-hidden">Worksheet options</h2>
+<h2 id="opts-h" class="panel-title">${ICON.sliders}Worksheet options</h2>
 <form id="ws-form">
 <fieldset>
-<legend class="visually-hidden">Options</legend>
-<div class="field"><label for="f-count">Number of problems</label>
+<legend>Layout</legend>
+<div class="field-row">
+<div class="field"><label for="f-count">Problems</label>
 <select id="f-count" name="count">${t.counts.map((n) => `<option value="${n}"${n === t.count ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
-<div class="field"><label for="f-title">Sheet title (optional)</label>
-<input id="f-title" name="title" type="text" maxlength="80" placeholder="${esc(clientType.sheetTitle)}"></div>
 <div class="field"><label for="f-paper">Paper size</label>
 <select id="f-paper" name="paper"><option value="letter">US Letter</option><option value="a4">A4</option></select></div>
+</div>
+</fieldset>
+<fieldset>
+<legend>Sheet</legend>
+<div class="field"><label for="f-title">Sheet title (optional)</label>
+<input id="f-title" name="title" type="text" maxlength="80" placeholder="${esc(clientType.sheetTitle)}"></div>
 <label class="check"><input type="checkbox" name="answers" checked> Include answer key (page 2)</label>
 <label class="check"><input type="checkbox" name="large"> Large print</label>
 </fieldset>
 </form>
-<button type="button" class="btn" id="ws-print">${icon('<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>')}Print / Save as PDF</button>
-<button type="button" class="btn secondary" id="ws-new">${icon('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>')}New problems</button>
-<button type="button" class="btn secondary" id="ws-copy">${icon('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>')}Copy link to this sheet</button>
-<p class="seed">Worksheet <span id="ws-seed">#${seed}</span>. The same link always gives the same problems.</p>
+<div class="ws-actions">
+<button type="button" class="btn btn-primary" id="ws-print">${icon('<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>')}<span>Print<span class="hide-sm"> / Save as PDF</span></span></button>
+<button type="button" class="btn btn-secondary" id="ws-new">${icon('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>')}<span>New<span class="hide-sm"> problems</span></span></button>
+<button type="button" class="btn btn-secondary" id="ws-copy">${icon('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>')}<span>Copy link<span class="visually-hidden"> to this sheet</span></span></button>
 <p class="status" id="ws-status" role="status" aria-live="polite"></p>
+</div>
+<p class="seed"><span>Worksheet <span id="ws-seed">#${seed}</span>. The same link always gives the same problems.</span></p>
 <noscript><p class="notice">JavaScript is off: you can still print the sample worksheet below with your browser’s print command.</p></noscript>
 </aside>
-<section aria-label="Worksheet preview" class="sheet-wrap" id="ws-output">${sheets}</section>
-</div>
+<section aria-label="Worksheet preview" class="preview">
+<div class="preview-bar no-print"><span class="live"><i aria-hidden="true"></i>Live preview</span><span class="hint">Updates as you change the options</span></div>
+<div class="sheet-wrap desk" id="ws-output">${sheets}</div>
+</section>
+</div></div>
+<div class="wrap more">
 ${adSlot('top')}
 <section class="content">
 <h2>About this worksheet</h2>
@@ -254,6 +400,7 @@ ${t.intro.slice(1).map((p) => `<p>${esc(p)}</p>`).join('')}
 ${related.length ? `<section class="related"><h2>Related worksheets</h2><ul>${related.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${siblings.length ? `<section class="related"><h2>More ${esc(c.name.toLowerCase())} worksheets</h2><ul>${siblings.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${adSlot('bottom')}
+</div>
 <script type="application/json" id="ws-config">${JSON.stringify({ type: clientType, defaultSeed: seed, siteName: config.name }).replace(/</g, '\\u003c')}</script>`;
 
   const ld = [bc.ld, {
@@ -261,7 +408,7 @@ ${adSlot('bottom')}
     url: abs(typeUrl(t)), learningResourceType: 'Worksheet', educationalLevel: t.grade, inLanguage: 'en',
     isAccessibleForFree: true, about: c.name, publisher: { '@type': 'Organization', name: config.name, url: abs('/') }
   }];
-  return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld });
+  return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar' });
 }
 
 function contactLine() {
@@ -272,7 +419,7 @@ function contactLine() {
 
 function staticPages(assets) {
   const pages = [];
-  const page = (p, title, desc, h1, html) => pages.push({ p, html: layout(assets, { title: `${title} | ${config.name}`, desc, pathName: p, body: `<article class="content"><h1>${esc(h1)}</h1>${html}</article>`, scripts: false }) });
+  const page = (p, title, desc, h1, html) => pages.push({ p, html: layout(assets, { title: `${title} | ${config.name}`, desc, pathName: p, body: `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><p class="kicker">${esc(config.name)}</p><h1>${esc(h1)}</h1></div></section><div class="wrap page-body"><article class="content paper">${html}</article></div>`, scripts: false }) });
 
   page('/about/', 'About', `About ${config.name}: free printable math worksheets generated in the browser.`, `About ${config.name}`, `
 <p>${esc(config.name)} is a free collection of math worksheet generators for parents, teachers, tutors and home-schoolers. Each page focuses on one precise skill, from addition within 10 to integers and percentages, and produces a new printable sheet with an answer key in one click.</p>
@@ -334,9 +481,10 @@ ${adsSection}
 }
 
 function notFoundPage(assets) {
-  const body = `<article class="content"><h1>Page not found</h1>
-<p>Sorry, this page does not exist or has moved. You can find every worksheet on the <a href="/">home page</a>, or open a category:</p>
-<ul>${categories.map((c) => `<li><a href="/${c.slug}/">${esc(c.name)} worksheets</a></li>`).join('')}</ul></article>`;
+  const body = `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><p class="kicker">Error 404</p><h1>Page not found</h1>
+<p class="lead">Sorry, this page does not exist or has moved. You can find every worksheet on the home page, or open a category below.</p>
+<div class="hero-actions head-actions"><a class="btn btn-primary" href="/">Go to the home page ${ICON.arrow}</a><a class="btn btn-ghost" href="/#all">Browse all worksheets</a></div></div></section>
+<div class="wrap page-body"><ul class="cat-grid">${categories.map(catCard).join('')}</ul></div>`;
   return layout(assets, { title: `Page not found | ${config.name}`, desc: 'This page does not exist. Browse all free printable math worksheets from the home page or a category.', pathName: '/404.html', body, noindex: true, scripts: false });
 }
 
