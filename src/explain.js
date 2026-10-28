@@ -328,11 +328,94 @@ X.exponents = (p) => {
   return { answer: p.answer, steps: [`The exponent ${e} means: multiply ${b} by itself ${e} times.`, `${Array(e).fill(b).join(` ${TIMES} `)} = ${b ** e}.`] };
 };
 
+// ---------- week 3 ----------
+X.clock = (p) => {
+  const steps = [`The short hand is the hour hand. ${p.m === 0 ? `It points exactly at the ${p.h}` : `It has passed the ${p.h} but has not reached the ${p.h % 12 + 1}`}, so the hour is ${p.h}.`];
+  steps.push(p.m === 0
+    ? 'The long hand is the minute hand. It points straight up at the 12, which means 0 minutes: the time is on the hour.'
+    : `The long hand is the minute hand. It points at the ${p.m / 5}. Count by fives from the 12: ${Array.from({ length: p.m / 5 }, (_, i) => (i + 1) * 5).join(', ')}. That is ${p.m} minutes.`);
+  steps.push(`Write the hour, a colon, then the minutes with two digits: ${p.answer}.`);
+  return { steps, answer: p.answer };
+};
+X.pow10 = (p) => {
+  const m = p.text.match(/^([\d.,]+) ([×÷]) ([\d,]+)/);
+  const k = num(m[3]), zeros = String(k).length - 1, dir = m[2] === TIMES ? 'left' : 'right';
+  return { answer: p.answer, steps: [
+    `${k.toLocaleString('en-US')} has ${zeros} zero${zeros > 1 ? 's' : ''}, so every digit moves ${zeros} place${zeros > 1 ? 's' : ''} to the ${dir} (${m[2] === TIMES ? 'the number gets bigger' : 'the number gets smaller'}).`,
+    `${m[1]} ${m[2]} ${m[3]} = ${p.answer}.`] };
+};
+X.decDiv = (p) => {
+  const m = p.text.match(/^([\d.]+) ÷ (\d+)/);
+  const a = m[1], d = +m[2], places = (a.split('.')[1] || '').length, whole = Math.round(num(a) * 10 ** places);
+  const q = whole / d;
+  return { answer: p.answer, steps: [
+    `Ignore the decimal point for now and divide ${whole} by ${d}: ${whole} ${DIV} ${d} = ${q}.`,
+    `${a} has ${places} digit${places > 1 ? 's' : ''} after the decimal point, so the quotient does too: put the point ${places} place${places > 1 ? 's' : ''} from the right in ${q}.`,
+    `Check: ${p.answer} ${TIMES} ${d} = ${a}.`] };
+};
+X.equation = (p) => {
+  const t = p.text.replace(/<span class="eq-gap"><\/span>.*$/, '').replace(/<\/?span>|<\/?i>/g, '');
+  const [left, right] = t.split(' = '), r = num(right), x = num(p.answer);
+  let m, steps;
+  if ((m = left.match(/^(\d+)x ([+−]) (\d+)$/))) {
+    const a = +m[1], b = +m[3], plus = m[2] === '+', mid = plus ? r - b : r + b;
+    steps = [`Undo the ${plus ? 'addition' : 'subtraction'} first: ${plus ? 'subtract' : 'add'} ${b} on both sides. ${a}x = ${right} ${plus ? MINUS : '+'} ${b} = ${mid}.`,
+      `Undo the multiplication: divide both sides by ${a}. x = ${mid} ${DIV} ${a} = ${x}.`];
+    steps.push(`Check: ${a} ${TIMES} ${x} ${m[2]} ${b} = ${right}.`);
+  } else if ((m = left.match(/^(\d+)x$/))) {
+    steps = [`${m[1]}x means ${m[1]} ${TIMES} x. Undo the multiplication: divide both sides by ${m[1]}.`, `x = ${right} ${DIV} ${m[1]} = ${x}.`, `Check: ${m[1]} ${TIMES} ${x} = ${right}.`];
+  } else if ((m = left.match(/^x ÷ (\d+)$/))) {
+    steps = [`Undo the division: multiply both sides by ${m[1]}.`, `x = ${right} ${TIMES} ${m[1]} = ${x}.`, `Check: ${x} ${DIV} ${m[1]} = ${right}.`];
+  } else if ((m = left.match(/^x − (\d+)$/))) {
+    steps = [`Undo the subtraction: add ${m[1]} to both sides.`, `x = ${right} + ${m[1]} = ${x}.`, `Check: ${x} ${MINUS} ${m[1]} = ${right}.`];
+  } else if ((m = left.match(/^(?:x \+ (\d+)|(\d+) \+ x)$/))) {
+    const a = m[1] || m[2];
+    steps = [`Undo the addition: subtract ${a} from both sides.`, `x = ${right} ${MINUS} ${a} = ${x}.`, `Check: ${left.replace('x', String(x))} = ${right}.`];
+  } else throw new Error('Unknown equation ' + p.text);
+  return { steps, answer: String(x) };
+};
+X.money = (p) => {
+  const c = (s) => Math.round(Number(s.replace('$', '')) * 100), a = c(p.a), b = c(p.b);
+  const steps = [`Line up the decimal points and work in cents: ${p.a} is ${a} cents and ${p.b} is ${b} cents.`]
+    .concat(p.op === '+' ? columnAdd(a, b) : columnSub(a, b));
+  steps.push(`${p.op === '+' ? a + b : a - b} cents = ${p.answer}. Put the decimal point back two places from the right.`);
+  return { steps, answer: p.answer };
+};
+X.convert = (p) => {
+  const m = p.text.match(/^([\d,]+) (\S+) = ___ (\S+)$/);
+  const UNIT = { 'km-m': 1000, 'm-cm': 100, 'cm-mm': 10, 'kg-g': 1000, 'L-mL': 1000, 'ft-in': 12, 'yd-ft': 3, 'yd-in': 36, 'lb-oz': 16, 'gal-qt': 4, 'qt-pt': 2, 'pt-cups': 2 };
+  const n = num(m[1]), down = UNIT[`${m[2]}-${m[3]}`], up = UNIT[`${m[3]}-${m[2]}`];
+  const one = (big, small, f) => `1 ${big} = ${f.toLocaleString('en-US')} ${small}.`;
+  const steps = down
+    ? [one(m[2], m[3], down), `A bigger unit to a smaller unit: multiply. ${m[1]} ${TIMES} ${down.toLocaleString('en-US')} = ${p.answer}.`]
+    : [one(m[3], m[2], up), `A smaller unit to a bigger unit: divide. ${m[1]} ${DIV} ${up.toLocaleString('en-US')} = ${p.answer}.`];
+  return { steps, answer: p.answer };
+};
+X.mixedNumbers = (p) => {
+  if (p.a.w !== undefined) {
+    const { w, n, d } = p.a;
+    return { answer: `${w * d + n}/${d}`, steps: [`Multiply the whole number by the denominator: ${w} ${TIMES} ${d} = ${w * d}.`, `Add the numerator: ${w * d} + ${n} = ${w * d + n}.`, `Keep the denominator ${d}: ${w} ${n}/${d} = ${w * d + n}/${d}.`] };
+  }
+  const [n, d] = p.a, w = Math.floor(n / d), r = n % d;
+  return { answer: `${w} ${r}/${d}`, steps: [`Divide the numerator by the denominator: ${n} ${DIV} ${d} = ${w} remainder ${r}.`, `The quotient ${w} is the whole number and the remainder ${r} is the new numerator over ${d}.`, `${n}/${d} = ${w} ${r}/${d}.`] };
+};
+const factors = (n) => { const f = []; for (let i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; };
+X.gcf = (p) => {
+  const [a, b] = p.text.match(/\d+/g).map(Number), fa = factors(a), fb = factors(b);
+  const common = fa.filter((x) => fb.includes(x));
+  return { answer: p.answer, steps: [`Factors of ${a}: ${fa.join(', ')}.`, `Factors of ${b}: ${fb.join(', ')}.`, `Common factors: ${common.join(', ')}. The greatest is ${common[common.length - 1]}.`] };
+};
+X.lcm = (p) => {
+  const [a, b] = p.text.match(/\d+/g).map(Number), big = Math.max(a, b), small = Math.min(a, b), L = lcm(a, b);
+  const list = []; for (let k = big; k <= L; k += big) list.push(k);
+  return { answer: String(L), steps: [`List multiples of the larger number, ${big}: ${list.join(', ')}.`, `The first one that ${small} divides exactly is ${L} (${L} ${DIV} ${small} = ${L / small}).`] };
+};
+
 function explain(type, problem) {
   const fn = X[type.gen];
   if (!fn) throw new Error('No worked example for generator ' + type.gen);
   const r = fn(problem, type.params || {});
-  return { steps: r.steps, answer: r.answer, expected: problem.kind === 'f' ? fracAnswerText(problem.answer) : problem.kind === 'fs' ? frac(problem.answer) : String(problem.answer) };
+  return { steps: r.steps, answer: r.answer, expected: problem.kind === 'f' ? fracAnswerText(problem.answer) : problem.kind === 'fs' ? frac(problem.answer) : problem.kind === 'fm' ? fracAnswerText(Array.isArray(problem.answer) ? { w: 0, n: problem.answer[0], d: problem.answer[1] } : problem.answer) : String(problem.answer) };
 }
 
 module.exports = { explain };

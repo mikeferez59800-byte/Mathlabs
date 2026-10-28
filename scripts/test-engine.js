@@ -16,7 +16,7 @@ let checked = 0;
 const failures = [];
 const fail = (t, seed, p, why) => { if (failures.length < 30) failures.push(`${t.slug} seed=${seed}: ${why} -> ${JSON.stringify(p)}`); };
 
-const num = (s) => Number(String(s).replace(/−/g, '-').replace(/[(),]/g, ''));
+const num = (s) => Number(String(s).replace(/−/g, '-').replace(/[(),$]/g, ''));
 const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
 const fracVal = (f) => f[0] / f[1];
 const ansVal = (a) => (typeof a === 'string' ? num(a) : a.w + (a.n ? a.n / a.d : 0));
@@ -52,6 +52,7 @@ function checkProblem(t, seed, p) {
       }
       if (t.gen === 'addWithin' && ans > P.max) fail(t, seed, p, 'sum above max');
       if (t.gen === 'decimal' && !/^\d+\.\d{2}$/.test(p.answer)) fail(t, seed, p, 'decimal format');
+      if (t.gen === 'money' && ![p.a, p.b, p.answer].every((x) => /^\$\d+\.\d{2}$/.test(x))) fail(t, seed, p, 'money format');
       break;
     }
     case 'h': {
@@ -76,6 +77,34 @@ function checkProblem(t, seed, p) {
         const m = p.text.match(/(\d+)% of (\d+)/);
         if (!close(+m[1] * +m[2] / 100, num(p.answer))) fail(t, seed, p, 'bad percent');
         if (!Number.isInteger(num(p.answer))) fail(t, seed, p, 'non-integer percent answer');
+        break;
+      }
+      if (t.gen === 'equation') {
+        const [lhs, rhs] = p.text.replace(/<span class="eq-gap"><\/span>.*$/, '').replace(/<\/?span>|<\/?i>/g, '').split(' = ');
+        const x = num(p.answer), filled = lhs.replace(/(\d)x/, '$1*x').replace('x', `(${x})`);
+        if (!Number.isInteger(x) || x < 0) fail(t, seed, p, 'solution not a whole number');
+        if (evalExpr(parseH(filled)) !== num(rhs)) fail(t, seed, p, 'equation not satisfied');
+        if (P.type === 'two' !== /^\d+x [+−]/.test(lhs)) fail(t, seed, p, 'wrong equation type');
+        break;
+      }
+      if (t.gen === 'convert') {
+        const F = { 'km-m': 1000, 'm-cm': 100, 'cm-mm': 10, 'kg-g': 1000, 'L-mL': 1000, 'ft-in': 12, 'yd-ft': 3, 'yd-in': 36, 'lb-oz': 16, 'gal-qt': 4, 'qt-pt': 2, 'pt-cups': 2 };
+        const m = p.text.match(/^([\d,]+) (\S+) = ___ (\S+)$/);
+        const exp = F[`${m[2]}-${m[3]}`] ? num(m[1]) * F[`${m[2]}-${m[3]}`] : num(m[1]) / F[`${m[3]}-${m[2]}`];
+        if (num(p.answer) !== exp || !Number.isInteger(exp)) fail(t, seed, p, `conversion, expected ${exp}`);
+        break;
+      }
+      if (t.gen === 'gcf' || t.gen === 'lcm') {
+        const [a, b] = p.text.match(/\d+/g).map(Number), g = gcd(a, b);
+        if (num(p.answer) !== (t.gen === 'gcf' ? g : a * b / g)) fail(t, seed, p, t.gen + ' wrong');
+        if (t.gen === 'gcf' && g === 1) fail(t, seed, p, 'trivial GCF');
+        break;
+      }
+      if (t.gen === 'pow10' || t.gen === 'decDiv') {
+        const m = p.text.match(/^([\d.,]+) ([×÷]) ([\d,]+)/), a = num(m[1]), k = num(m[3]);
+        const exp = Math.round((m[2] === '×' ? a * k : a / k) * 1e6) / 1e6;
+        if (num(p.answer) !== exp) fail(t, seed, p, `wrong answer, expected ${exp}`);
+        if (t.gen === 'decDiv' && (Number.isInteger(a) || !/^\d+(\.\d+)?$/.test(p.answer))) fail(t, seed, p, 'decimal division format');
         break;
       }
       if (text.includes('___')) {
@@ -116,6 +145,16 @@ function checkProblem(t, seed, p) {
     case 'fc': {
       const d = p.a[0] * p.b[1] - p.b[0] * p.a[1];
       if (p.answer !== (d > 0 ? '>' : d < 0 ? '<' : '=')) fail(t, seed, p, 'compare fractions');
+      break;
+    }
+    case 'clk':
+      if (!(p.h >= 1 && p.h <= 12) || p.m % P.step || p.m < 0 || p.m > 59) fail(t, seed, p, 'clock time out of range');
+      if (p.answer !== `${p.h}:${String(p.m).padStart(2, '0')}`) fail(t, seed, p, 'clock answer');
+      break;
+    case 'fm': {
+      const mixed = P.to === 'improper' ? p.a : p.answer, imp = P.to === 'improper' ? p.answer : p.a;
+      if (mixed.w * mixed.d + mixed.n !== imp[0] || mixed.d !== imp[1]) fail(t, seed, p, 'mixed/improper mismatch');
+      if (mixed.n < 1 || mixed.n >= mixed.d || gcd(mixed.n, mixed.d) !== 1 || mixed.w < 1) fail(t, seed, p, 'mixed number not proper');
       break;
     }
     default: fail(t, seed, p, 'unknown kind');

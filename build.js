@@ -83,7 +83,8 @@ const CAT_ICONS = {
   fractions: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>',
   decimals: '<circle cx="5" cy="17.5" r="1.2" fill="currentColor"/><rect x="8.5" y="5" width="5" height="13" rx="2.5"/><rect x="15.5" y="5" width="5" height="13" rx="2.5"/>',
   'number-sense': '<path d="M3 15h18M6 12v6M12 12v6M18 12v6"/><path d="m9 7 3-3 3 3"/>',
-  'pre-algebra': '<path d="M7 4c-2 2.5-3 5-3 8s1 5.5 3 8M17 4c2 2.5 3 5 3 8s-1 5.5-3 8"/><path d="m9 9 6 6M15 9l-6 6"/>'
+  'pre-algebra': '<path d="M7 4c-2 2.5-3 5-3 8s1 5.5 3 8M17 4c2 2.5 3 5 3 8s-1 5.5-3 8"/><path d="m9 9 6 6M15 9l-6 6"/>',
+  measurement: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>'
 };
 const ICON = {
   arrow: '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',

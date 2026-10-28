@@ -610,6 +610,12 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 .fr-n { border-bottom: 1.5px solid currentColor; padding: 0 .2em; }
 .fr-d { padding: 0 .2em; }
 .fr-w { margin-right: .15em; }
+
+/* Clocks and equations (week 3 generators) */
+.pclk { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+.clk { width: 100%; max-width: 120px; height: auto; display: block; }
+.clk-ans { display: flex; align-items: flex-end; gap: .2em; white-space: nowrap; }
+.eq-gap { display: inline-block; width: 1.2em; }
 .op { padding: 0 .1em; }
 .cmp-box { display: inline-block; width: 1.6em; height: 1.6em; border: 1.5px solid #111; border-radius: 4px; margin: 0 .3em; }
 .cmp { display: inline-block; min-width: 1.6em; text-align: center; margin: 0 .3em; }
