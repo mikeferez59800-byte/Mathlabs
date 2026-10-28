@@ -1,0 +1,14 @@
+{
+  "name": "mathsheetlab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Free printable math worksheet generators. Static site, no dependencies.",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node scripts/test-engine.js && node build.js && node scripts/check-site.js",
+    "check:live": "node scripts/check-live.js",
+    "serve": "node build.js && cd dist && python3 -m http.server 8080"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED"
+}
