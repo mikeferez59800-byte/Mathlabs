@@ -4,13 +4,22 @@
  */
 'use strict';
 
+// Accepts only a full URL like https://example.pages.dev; anything else falls back to the default
+// (a malformed SITE_URL would otherwise break every canonical link and the sitemap).
+function siteUrl(value, fallback) {
+  const v = (value || '').trim().replace(/\/$/, '');
+  if (/^https?:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(v)) return v;
+  if (v) console.warn(`WARNING: SITE_URL "${v}" is not a full URL like https://example.pages.dev; using ${fallback}`);
+  return fallback;
+}
+
 module.exports = {
   name: 'MathSheetLab',
   tagline: 'Free printable math worksheets, generated in your browser',
 
   // Public URL of the site, without trailing slash. Used for canonical URLs and the sitemap.
   // Set SITE_URL in Cloudflare Pages (e.g. https://mathsheetlab.pages.dev or your own domain).
-  url: (process.env.SITE_URL || 'https://mathsheetlab.pages.dev').replace(/\/$/, ''),
+  url: siteUrl(process.env.SITE_URL, 'https://mathlabs.pages.dev'),
 
   // Contact address shown on the Contact and Legal pages. Leave empty until you have one:
   // the pages then say so honestly instead of showing a fake address.
