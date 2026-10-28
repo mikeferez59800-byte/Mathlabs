@@ -47,6 +47,11 @@ module.exports = {
     }
   },
 
+  // Cloudflare Web Analytics (cookieless). Easiest: enable it in Cloudflare Pages > project > Metrics,
+  // which injects the script automatically and needs no token here. Only set CF_ANALYTICS_TOKEN
+  // if you add the site manually under Analytics & Logs > Web Analytics.
+  analyticsToken: process.env.CF_ANALYTICS_TOKEN || '',
+
   // Optional Google Search Console HTML-tag verification token (content="..." value).
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || 'deIIPbG75CvFmDynGaFyyoXJi-uRz0MJ2rIRozS6Trw'
 };

@@ -431,6 +431,7 @@
     randomSeed: randomSeed,
     generate: generate,
     renderSheet: renderSheet,
+    renderProblem: problemHtml,
     generators: G,
     _test: { hasCarry: hasCarry, hasBorrow: hasBorrow, gcd: gcd, simplify: simplify, mixed: mixed }
   };

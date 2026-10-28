@@ -20,6 +20,7 @@ node scripts/test-engine.js   # vérifie 1,3 million de problèmes (réponses et
 node scripts/check-site.js    # vérifie liens internes, titres, descriptions, sitemap
 npm run serve                 # build + aperçu local sur http://localhost:8080 (nécessite Python 3)
 SITE_URL=https://votre-site.pages.dev node scripts/check-live.js   # contrôle du site en ligne
+node scripts/make-og.js       # (après un build) régénère les images de partage dans static/og/ ; nécessite Playwright
 ```
 
 ## Structure
@@ -28,6 +29,8 @@ SITE_URL=https://votre-site.pages.dev node scripts/check-live.js   # contrôle d
 site.config.js          Nom du site, URL, e-mail de contact, réglages AdSense (via variables d'environnement)
 build.js                Générateur du site (pages, sitemap, robots.txt, _headers, ads.txt)
 src/catalog.js          Catalogue des fiches : 1 entrée = 1 page (titre, description, textes, paramètres)
+src/explain.js          Exemples résolus pas à pas (un par fiche), vérifiés par les tests
+static/og/              Images de partage 1200x630 (réseaux sociaux, Pinterest), copiées telles quelles dans dist/
 src/engine.js           Moteur : générateurs de problèmes + rendu HTML (partagé navigateur / build / tests)
 src/app.js              Interface : options, nouvelles fiches, impression, copie du lien, recherche
 src/styles.css          Styles écran + impression, mode sombre
@@ -41,7 +44,8 @@ docs/                   Tutoriel de mise en ligne, procédure AdSense et obligat
 
 1. Si un générateur existant convient (par ex. `add`, `sub`, `longDiv`), ajoutez simplement une entrée dans `src/catalog.js` avec un `slug` unique, un titre, une description, des paragraphes d'introduction **originaux** et les paramètres.
 2. Sinon, ajoutez une fonction `G.monGenerateur = function (rng, p) { ... }` dans `src/engine.js` qui renvoie un problème (`kind: 'h'` pour une ligne, `'v'` pour une opération posée, etc.), puis une vérification dans `scripts/test-engine.js`.
-3. Lancez `node scripts/test-engine.js && node build.js && node scripts/check-site.js`, puis poussez sur GitHub : Cloudflare reconstruit et publie tout seul, sitemap compris.
+3. Ajoutez un exemple résolu pour un nouveau générateur dans `src/explain.js`.
+4. Lancez `node scripts/test-engine.js && node build.js && node scripts/make-og.js && node scripts/check-site.js`, puis poussez sur GitHub : Cloudflare reconstruit et publie tout seul, sitemap compris.
 
 ## Variables d'environnement (Cloudflare Pages > Settings > Variables)
 
@@ -50,6 +54,7 @@ docs/                   Tutoriel de mise en ligne, procédure AdSense et obligat
 | `SITE_URL` | URL publique exacte, ex. `https://mathsheetlab.pages.dev` ou votre domaine |
 | `CONTACT_EMAIL` | Adresse affichée sur les pages Contact et Mentions légales |
 | `PUBLISHER_NAME` | Nom de l'éditeur pour les mentions légales (voir docs/ADSENSE-ET-LEGAL.md) |
+| `CF_ANALYTICS_TOKEN` | Facultatif : jeton Cloudflare Web Analytics si le site n'est pas activé en un clic dans Cloudflare Pages |
 | `GOOGLE_SITE_VERIFICATION` | Jeton de validation Search Console (méthode balise HTML), facultatif |
 | `ADSENSE_CLIENT` | `ca-pub-…` : ajoute la balise de validation AdSense et `ads.txt` (sans afficher de pub) |
 | `ADS_ENABLED` | `true` **uniquement après approbation AdSense** : charge le script et les blocs d'annonces |

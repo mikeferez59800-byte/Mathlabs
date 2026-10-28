@@ -59,6 +59,13 @@ Vérification : ouvrez `https://VOTRE-SITE.pages.dev/sitemap.xml` ; les adresses
    - Menu **Sitemaps** : saisissez `sitemap.xml` > **Envoyer**.
 2. **Bing Webmaster Tools** (https://www.bing.com/webmasters) : importez la propriété depuis Search Console (un clic).
 
+## Étape 5 bis : voir le nombre de visites (gratuit, sans cookie)
+
+1. Cloudflare > **Workers & Pages** > projet **mathlabs** > onglet **Metrics**.
+2. Dans le bloc **Web Analytics**, cliquez sur **Enable**. Cloudflare ajoute lui-même le petit script de mesure au prochain déploiement (aucun code à changer, aucun cookie, pas de bandeau nécessaire).
+3. Les chiffres (visites, pages vues, pages les plus consultées, pays, appareils) apparaissent au même endroit, ou dans **Analytics & Logs > Web Analytics**. Comptez quelques heures avant les premières données.
+4. Pour savoir ce que les gens cherchent sur Google avant d'arriver : Search Console > **Performances** (requêtes, clics, positions).
+
 ## Étape 6 (plus tard) : nom de domaine
 
 Recommandé avant la demande AdSense (voir `ADSENSE-ET-LEGAL.md`). Idéalement **dès le début**, pour ne pas devoir déménager le référencement.

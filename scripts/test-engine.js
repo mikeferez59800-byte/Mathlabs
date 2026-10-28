@@ -9,6 +9,7 @@
 
 const MSL = require('../src/engine');
 const { types } = require('../src/catalog');
+const { explain } = require('../src/explain');
 
 const SEEDS = 300;
 let checked = 0;
@@ -129,6 +130,12 @@ for (const t of types) {
       const probs = MSL.generate(t, seed, count);
       if (probs.length !== count) fail(t, seed, null, 'wrong count');
       probs.forEach((p) => checkProblem(t, seed, p));
+      if (s % 10 === 0) probs.forEach((p) => {
+        // Worked examples must reach the same answer as the answer key and contain no broken values.
+        const ex = explain(t, p);
+        if (ex.answer.replace(/,/g, '') !== ex.expected.replace(/,/g, '')) fail(t, seed, p, `worked example gives ${ex.answer}, key says ${ex.expected}`);
+        if (!ex.steps.length || ex.steps.some((x) => /NaN|undefined|Infinity/.test(x))) fail(t, seed, p, 'broken worked example text');
+      });
     }
   }
   const a = JSON.stringify(MSL.generate(t, 424242, t.count)), b = JSON.stringify(MSL.generate(t, 424242, t.count));

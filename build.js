@@ -13,10 +13,12 @@ const crypto = require('crypto');
 const config = require('./site.config');
 const { categories, types } = require('./src/catalog');
 const MSL = require('./src/engine');
+const { explain } = require('./src/explain');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
 const LASTMOD_FILE = path.join(ROOT, 'data', 'lastmod.json');
+const STATIC = path.join(ROOT, 'static');
 const today = new Date().toISOString().slice(0, 10);
 const warnings = [];
 
@@ -110,11 +112,20 @@ function adSlot(name) {
 }
 
 // ---------- layout ----------
+function ogImageFor(pathName) {
+  // Share images are pre-rendered by scripts/make-og.js into static/og/ (committed to the repo).
+  const slug = pathName.split('/').filter(Boolean).pop() || 'home';
+  for (const name of [slug, 'default']) if (fs.existsSync(path.join(STATIC, 'og', name + '.jpg'))) return abs(`/og/${name}.jpg`);
+  return '';
+}
+
 function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true, bodyClass = '' }) {
   const canonical = abs(pathName);
+  const ogImage = ogImageFor(pathName);
   const headExtra = [];
   if (config.googleSiteVerification) headExtra.push(`<meta name="google-site-verification" content="${esc(config.googleSiteVerification)}">`);
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) headExtra.push(`<meta name="google-adsense-account" content="${esc(config.ads.client)}">`);
+  if (config.analyticsToken) headExtra.push(`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='${JSON.stringify({ token: config.analyticsToken })}'></script>`);
   if (adsOn) headExtra.push(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(config.ads.client)}" crossorigin="anonymous"></script>`);
   const ld = jsonld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('');
   const nav = categories.map((c) => `<li><a href="/${c.slug}/"${pathName.startsWith('/' + c.slug + '/') ? ' aria-current="page"' : ''}>${esc(c.name)}</a></li>`).join('');
@@ -132,7 +143,11 @@ ${noindex ? '<meta name="robots" content="noindex">' : ''}
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(canonical)}">
-<meta name="twitter:card" content="summary">
+${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${esc(ogImage)}">` : '<meta name="twitter:card" content="summary">'}
 <meta name="theme-color" content="#0B1020">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="${assets.font}" as="font" type="font/woff2" crossorigin>
@@ -344,6 +359,7 @@ function worksheetPage(assets, t) {
   const siblings = types.filter((x) => x.cat === t.cat && x.slug !== t.slug);
   const related = (t.related || []).map((s) => typeBySlug[s]);
   const icon = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const worked = workedExample(t, clientType);
 
   const body = `<section class="page-head dark ws-intro has-panel"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
 <h1>${esc(t.h1.charAt(0).toUpperCase() + t.h1.slice(1))}</h1>
@@ -391,6 +407,7 @@ ${adSlot('top')}
 <h2>About this worksheet</h2>
 ${t.intro.slice(1).map((p) => `<p>${esc(p)}</p>`).join('')}
 <p>Each sheet contains ${t.counts.join(', ').replace(/, (\d+)$/, ' or $1')} problems (your choice) and is generated at random. Press “New problems” as many times as you like; there is no limit and no account needed.</p>
+${worked}
 <h2>Teaching tips</h2>
 <ul>${t.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
 <h2>How to print or save as PDF</h2>
@@ -409,6 +426,26 @@ ${adSlot('bottom')}
     isAccessibleForFree: true, about: c.name, publisher: { '@type': 'Organization', name: config.name, url: abs('/') }
   }];
   return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar' });
+}
+
+// One fully explained problem per page. Among a few candidates, take the one with the most steps
+// (usually the one that shows regrouping, borrowing, simplifying...).
+function workedExample(t, clientType) {
+  const candidates = MSL.generate(clientType, MSL.hashString(t.slug) + 1, 12);
+  let best = null;
+  for (const p of candidates) {
+    const ex = explain(clientType, p);
+    if (!best || ex.steps.length > best.ex.steps.length) best = { p, ex };
+  }
+  const { p, ex } = best;
+  // "1 5/21" reads like 15/21 in running text: spell mixed numbers as "1 and 5/21".
+  const mixed = (x) => esc(x).replace(/(^|[^\d/])(\d+) (\d+\/\d+)/g, '$1$2 and $3');
+  return `<h2>Worked example</h2>
+<div class="worked">
+<div class="worked-problem" aria-label="Example problem">${MSL.renderProblem(p, false)}</div>
+<ol class="worked-steps">${ex.steps.map((x) => `<li>${mixed(x)}</li>`).join('')}</ol>
+<p class="worked-answer">Answer: <strong>${mixed(ex.answer)}</strong></p>
+</div>`;
 }
 
 function contactLine() {
@@ -448,8 +485,9 @@ function staticPages(assets) {
 <p>Last updated: ${today}.</p>
 <h2>Summary</h2>
 <p>${esc(config.name)} does not require an account and does not ask for your name, email or any other personal information. Worksheets are generated entirely in your browser; the options you choose and any title you type stay on your device and are only placed in the page address so the link can reproduce the sheet.</p>
-<h2>Hosting and server logs</h2>
+<h2>Hosting, server logs and visit statistics</h2>
 <p>The site is hosted by ${esc(config.host.name)}. Like any web host, it processes technical data such as your IP address, browser type and the pages requested, in order to deliver the site and protect it against abuse. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare’s privacy policy</a>.</p>
+<p>To know which worksheets are useful, we count visits with Cloudflare Web Analytics. It does not use cookies, does not store anything on your device and does not track you across websites; we only see aggregated numbers such as page views per page and per country.</p>
 ${adsSection}
 <h2>Your rights</h2>
 <p>Depending on where you live (for example under the EU/UK GDPR or US state privacy laws) you may have rights to access, correct or delete personal data, or to object to its processing. Since this site does not itself store personal data about visitors, most requests concern our providers listed above. You can also contact us: ${contactLine()}.</p>
@@ -532,6 +570,7 @@ function main() {
   write('/sitemap.xml', sitemap(entries));
   write('/robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${abs('/sitemap.xml')}\n`);
   write('/_headers', HEADERS);
+  if (fs.existsSync(STATIC)) fs.cpSync(STATIC, DIST, { recursive: true });
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) {
     write('/ads.txt', `google.com, ${config.ads.client.replace('ca-', '')}, DIRECT, f08c47fec0942fa0\n`);
   }

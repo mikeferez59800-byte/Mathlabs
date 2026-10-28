@@ -46,6 +46,8 @@ for (const file of files) {
     if (!u.startsWith('/')) { errors.push(`${rel}: relative link ${u}`); continue; }
     if (!exists(u)) errors.push(`${rel}: broken link ${u}`);
   }
+  const og = (html.match(/<meta property="og:image" content="([^"]+)"/) || [])[1];
+  if (og && (!og.startsWith(config.url) || !exists(og.slice(config.url.length)))) errors.push(`${rel}: og:image ${og} has no file`);
   // ids referenced by labels must exist
   for (const m of html.matchAll(/<label for="([^"]+)"/g)) if (!html.includes(`id="${m[1]}"`)) errors.push(`${rel}: label for missing id ${m[1]}`);
 }
