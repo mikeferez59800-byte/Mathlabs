@@ -342,6 +342,96 @@
     return { kind: 'h', text: n.toLocaleString('en-US') + ' =', answer: parts.join(' + ') };
   };
 
+  // ---------- Week 3 generators ----------
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+
+  // Analog clock: p.step = minutes between possible times (60, 30, 15 or 5).
+  G.clock = function (rng, p) {
+    var h = rng.int(1, 12), m = p.step * rng.int(0, 60 / p.step - 1);
+    return { kind: 'clk', h: h, m: m, answer: h + ':' + pad2(m) };
+  };
+
+  // Multiply or divide by 10, 100 or 1,000.
+  G.pow10 = function (rng, p) {
+    var k = rng.pick([10, 100, 1000]);
+    if (p.op === '÷') {
+      var a = rng.int(1, 9999);
+      return { kind: 'h', text: a.toLocaleString('en-US') + ' ÷ ' + k.toLocaleString('en-US') + ' =', answer: trimDec(a / k) };
+    }
+    var b = rng.next() < 0.3 ? rng.int(11, 999) / 10 : rng.int(2, 999);
+    return { kind: 'h', text: trimDec(b) + ' × ' + k.toLocaleString('en-US') + ' =', answer: (Math.round(b * k * 10) / 10).toLocaleString('en-US') };
+  };
+
+  // Decimal (tenths or hundredths) divided by a one-digit whole number, exact quotient.
+  G.decDiv = function (rng, p) {
+    var f = Math.pow(10, p.places), d = rng.int(2, 9);
+    var q = draw(function () { return rng.int(f + 1, p.maxQ * f); }, function (x) { return (x * d) % 10 !== 0; });
+    return { kind: 'h', text: fmtDec(q * d / f, p.places) + ' ÷ ' + d + ' =', answer: trimDec(q / f) };
+  };
+
+  // Equations in x. p.type: 'addsub', 'muldiv' or 'two'.
+  var X = '<i>x</i>';
+  function eq(left, right, x) {
+    return { kind: 'h', html: true, text: '<span>' + left + ' = ' + right + '</span><span class="eq-gap"></span><span>' + X + ' =</span> ___', answer: String(x) };
+  }
+  G.equation = function (rng, p) {
+    var x, a, b;
+    if (p.type === 'addsub') {
+      x = rng.int(0, 30); a = rng.int(1, 30);
+      switch (rng.int(0, 2)) {
+        case 0: return eq(X + ' + ' + a, String(x + a), x);
+        case 1: return eq(a + ' + ' + X, String(x + a), x);
+        default: x = rng.int(a, a + 30); return eq(X + ' − ' + a, String(x - a), x);
+      }
+    }
+    if (p.type === 'muldiv') {
+      x = rng.int(1, 12); a = rng.int(2, 12);
+      return rng.next() < 0.6 ? eq(a + X, String(a * x), x) : eq(X + ' ÷ ' + a, String(x), a * x);
+    }
+    x = rng.int(1, 12); a = rng.int(2, 9); b = rng.int(1, 20);
+    if (rng.next() < 0.5) return eq(a + X + ' + ' + b, String(a * x + b), x);
+    x = rng.int(Math.ceil((b + 1) / a), 15);
+    return eq(a + X + ' − ' + b, String(a * x - b), x);
+  };
+
+  // Money in column form.
+  function dollars(c) { return '$' + (c / 100).toFixed(2); }
+  G.money = function (rng, p) {
+    var a = rng.int(100, p.max * 100), b = rng.int(100, p.max * 100);
+    if (p.op === '−' && a < b) { var t = a; a = b; b = t; }
+    return { kind: 'v', a: dollars(a), b: dollars(b), op: p.op, answer: dollars(p.op === '+' ? a + b : a - b) };
+  };
+
+  // Unit conversions. Each unit pair: [big, small, factor].
+  var UNITS = {
+    metric: [['km', 'm', 1000], ['m', 'cm', 100], ['cm', 'mm', 10], ['kg', 'g', 1000], ['L', 'mL', 1000]],
+    customary: [['ft', 'in', 12], ['yd', 'ft', 3], ['yd', 'in', 36], ['lb', 'oz', 16], ['gal', 'qt', 4], ['qt', 'pt', 2], ['pt', 'cups', 2]]
+  };
+  G.convert = function (rng, p) {
+    var u = rng.pick(UNITS[p.system]), n = rng.int(2, 12);
+    if (rng.next() < 0.5) return { kind: 'h', text: n + ' ' + u[0] + ' = ___ ' + u[1], answer: (n * u[2]).toLocaleString('en-US') };
+    return { kind: 'h', text: (n * u[2]).toLocaleString('en-US') + ' ' + u[1] + ' = ___ ' + u[0], answer: String(n) };
+  };
+
+  // Mixed numbers and improper fractions.
+  G.mixedNumbers = function (rng, p) {
+    var d = rng.int(2, p.maxDen), n = draw(function () { return rng.int(1, d - 1); }, function (x) { return gcd(x, d) === 1; });
+    var w = rng.int(1, p.maxWhole);
+    if (p.to === 'improper') return { kind: 'fm', a: { w: w, n: n, d: d }, answer: [w * d + n, d] };
+    return { kind: 'fm', a: [w * d + n, d], answer: { w: w, n: n, d: d } };
+  };
+
+  G.gcf = function (rng, p) {
+    var v = draw(function () { return [rng.int(2, p.maxG), rng.int(1, 9), rng.int(1, 9)]; },
+      function (x) { return x[1] !== x[2] && gcd(x[1], x[2]) === 1; });
+    return { kind: 'h', text: 'GCF of ' + v[0] * v[1] + ' and ' + v[0] * v[2] + ' =', answer: String(v[0]) };
+  };
+
+  G.lcm = function (rng, p) {
+    var v = draw(function () { return [rng.int(2, p.max), rng.int(2, p.max)]; }, function (x) { return x[0] !== x[1]; });
+    return { kind: 'h', text: 'LCM of ' + v[0] + ' and ' + v[1] + ' =', answer: String(lcm(v[0], v[1])) };
+  };
+
   // ---------- Build a worksheet ----------
   function generate(type, seed, count) {
     var rng = makeRng(seed);
@@ -376,8 +466,28 @@
     if (a.n === 0) return String(a.w);
     return (a.w ? '<span class="fr-w">' + a.w + '</span>' : '') + frac([a.n, a.d]);
   }
+  function mixedHtml(m) {
+    return '<span class="fr-w">' + m.w + '</span>' + frac([m.n, m.d]);
+  }
+  // Analog clock face as inline SVG (hands computed from the time).
+  function clockSvg(h, m) {
+    var out = '<svg class="clk" viewBox="0 0 100 100" role="img" aria-label="Clock face"><circle cx="50" cy="50" r="46" fill="#fff" stroke="#111" stroke-width="2.5"/>';
+    for (var i = 0; i < 60; i++) {
+      var a = i * Math.PI / 30, big = i % 5 === 0, r1 = big ? 40 : 43;
+      out += '<line x1="' + (50 + r1 * Math.sin(a)).toFixed(2) + '" y1="' + (50 - r1 * Math.cos(a)).toFixed(2) + '" x2="' + (50 + 46 * Math.sin(a)).toFixed(2) + '" y2="' + (50 - 46 * Math.cos(a)).toFixed(2) + '" stroke="#111" stroke-width="' + (big ? 1.8 : 0.7) + '"/>';
+    }
+    for (var n = 1; n <= 12; n++) {
+      var b = n * Math.PI / 6;
+      out += '<text x="' + (50 + 34 * Math.sin(b)).toFixed(2) + '" y="' + (50 - 34 * Math.cos(b) + 3.2).toFixed(2) + '" text-anchor="middle" font-size="9" font-family="Arial, sans-serif" fill="#111">' + n + '</text>';
+    }
+    var ha = ((h % 12) + m / 60) * Math.PI / 6, ma = m * Math.PI / 30;
+    out += '<line x1="50" y1="50" x2="' + (50 + 18 * Math.sin(ha)).toFixed(2) + '" y2="' + (50 - 18 * Math.cos(ha)).toFixed(2) + '" stroke="#111" stroke-width="4" stroke-linecap="round"/>';
+    out += '<line x1="50" y1="50" x2="' + (50 + 28 * Math.sin(ma)).toFixed(2) + '" y2="' + (50 - 28 * Math.cos(ma)).toFixed(2) + '" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>';
+    return out + '<circle cx="50" cy="50" r="2.6" fill="#111"/></svg>';
+  }
   function answerHtml(p) {
     switch (p.kind) {
+      case 'fm': return p.answer.w !== undefined ? mixedHtml(p.answer) : frac(p.answer);
       case 'f': return fracAnswer(p.answer);
       case 'fs': return frac(p.answer);
       default: return esc(String(p.answer));
@@ -401,6 +511,12 @@
       case 'fs':
         return '<div class="ph pf">' + frac(p.a) + '<span class="op">=</span>' +
           (withAnswer ? '<span class="ans">' + answerHtml(p) + '</span>' : '<span class="blank"></span>') + '</div>';
+      case 'fm':
+        return '<div class="ph pf">' + (p.a.w !== undefined ? mixedHtml(p.a) : frac(p.a)) + '<span class="op">=</span>' +
+          (withAnswer ? '<span class="ans">' + answerHtml(p) + '</span>' : '<span class="blank"></span>') + '</div>';
+      case 'clk':
+        return '<div class="pclk">' + clockSvg(p.h, p.m) + '<span class="clk-ans">' +
+          (withAnswer ? '<span class="ans">' + esc(p.answer) + '</span>' : '<span class="blank sm"></span> : <span class="blank sm"></span>') + '</span></div>';
       case 'fc':
         return '<div class="ph pf">' + frac(p.a) + (withAnswer ? '<span class="ans cmp">' + esc(p.answer) + '</span>' : '<span class="cmp-box"></span>') + frac(p.b) + '</div>';
       default:

@@ -8,12 +8,13 @@
   "Fractions Worksheets",
   "Decimals Worksheets",
   "Number Sense Worksheets",
-  "Pre-algebra Worksheets"
+  "Pre-algebra Worksheets",
+  "Time, Money & Measurement Worksheets"
  ],
  "pins": [
   {
    "image": "https://mathlabs.pages.dev/pins/home.jpg",
-   "title": "61 Free Printable Math Worksheet Generators (K to 7th Grade)",
+   "title": "79 Free Printable Math Worksheet Generators (K to 7th Grade)",
    "description": "Free math worksheets for kindergarten to 7th grade: addition, subtraction, multiplication tables, long division, fractions, decimals, rounding and pre-algebra. Generate a new sheet in one click, print or save as PDF, answer key included. Perfect for teachers, parents and homeschool. No sign-up.",
    "link": "https://mathlabs.pages.dev/",
    "board": "Free Printable Math Worksheets",
@@ -147,6 +148,21 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/telling-time-hour.jpg",
+   "title": "Telling Time to the Hour Worksheets – Free Printable with Answer Key",
+   "description": "Free printable telling time worksheets: read analog clocks to the hour and write the time. New clocks every time, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/telling-time-hour/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Telling time to the hour",
+    "time, money & measurement worksheets",
+    "kindergarten and 1st grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/addition-within-20.jpg",
    "title": "Addition within 20 Worksheets – Free Printable with Answer Key",
    "description": "Printable addition facts worksheets with sums to 20. Unlimited random sheets, answer keys, print or download as PDF. Grade 1 and grade 2 practice. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -261,6 +277,21 @@
     "Multiplying integers worksheets",
     "pre-algebra worksheets",
     "7th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/telling-time-half-hour.jpg",
+   "title": "Telling Time to the Half Hour Worksheets – Free Printable with Answer Key",
+   "description": "Free printable telling time worksheets: read analog clocks to the half hour and write the time. New clocks every time, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/telling-time-half-hour/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Telling time to the half hour",
+    "time, money & measurement worksheets",
+    "1st grade math",
     "free printable math worksheets",
     "math worksheets with answer key",
     "homeschool math"
@@ -447,9 +478,24 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/telling-time-quarter-hour.jpg",
+   "title": "Telling Time to the Quarter Hour Worksheets – Free Printable with Answer Key",
+   "description": "Free printable telling time worksheets: read analog clocks to the quarter hour and write the time. New clocks every time, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/telling-time-quarter-hour/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Telling time to the quarter hour",
+    "time, money & measurement worksheets",
+    "2nd grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/fractions.jpg",
-   "title": "8 Free Fractions Worksheets – Printable with Answer Keys",
-   "description": "Simplifying, comparing, adding, subtracting, multiplying and dividing fractions. 8 free printable fractions worksheet generators, from grade 4 to grade 6. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
+   "title": "10 Free Fractions Worksheets – Printable with Answer Keys",
+   "description": "Simplifying, comparing, adding, subtracting, multiplying and dividing fractions. 10 free printable fractions worksheet generators, from grade 4 to grade 5. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
    "link": "https://mathlabs.pages.dev/fractions/",
    "board": "Free Printable Math Worksheets",
    "keywords": [
@@ -463,8 +509,8 @@
   },
   {
    "image": "https://mathlabs.pages.dev/pins/decimals.jpg",
-   "title": "4 Free Decimals Worksheets – Printable with Answer Keys",
-   "description": "Adding, subtracting and multiplying decimals in column form. 4 free printable decimals worksheet generators, from grade 5 to grade 5. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
+   "title": "7 Free Decimals Worksheets – Printable with Answer Keys",
+   "description": "Adding, subtracting, multiplying and dividing decimals, and multiplying by 10, 100 and 1,000. 7 free printable decimals worksheet generators, from grade 5 to grade 6. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
    "link": "https://mathlabs.pages.dev/decimals/",
    "board": "Free Printable Math Worksheets",
    "keywords": [
@@ -478,8 +524,8 @@
   },
   {
    "image": "https://mathlabs.pages.dev/pins/number-sense.jpg",
-   "title": "6 Free Number Sense Worksheets – Printable with Answer Keys",
-   "description": "Rounding, comparing numbers, expanded form and missing addends. 6 free printable number sense worksheet generators, from grade 1 to grade 4. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
+   "title": "8 Free Number Sense Worksheets – Printable with Answer Keys",
+   "description": "Rounding, comparing numbers, expanded form, missing addends, GCF and LCM. 8 free printable number sense worksheet generators, from grade 1 to grade 6. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
    "link": "https://mathlabs.pages.dev/number-sense/",
    "board": "Free Printable Math Worksheets",
    "keywords": [
@@ -493,12 +539,27 @@
   },
   {
    "image": "https://mathlabs.pages.dev/pins/pre-algebra.jpg",
-   "title": "7 Free Pre-algebra Worksheets – Printable with Answer Keys",
-   "description": "Integers, order of operations, exponents and percentages. 7 free printable pre-algebra worksheet generators, from grade 6 to grade 7. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
+   "title": "10 Free Pre-algebra Worksheets – Printable with Answer Keys",
+   "description": "Integers, order of operations, exponents, percentages and equations. 10 free printable pre-algebra worksheet generators, from grade 6 to grade 7. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
    "link": "https://mathlabs.pages.dev/pre-algebra/",
    "board": "Free Printable Math Worksheets",
    "keywords": [
     "pre-algebra worksheets",
+    "free printable math worksheets",
+    "math practice",
+    "elementary math",
+    "homeschool math",
+    "math worksheets with answer key"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/measurement.jpg",
+   "title": "8 Free Time, Money & Measurement Worksheets – Printable with Answer Keys",
+   "description": "Telling time on a clock, adding and subtracting money, and converting units. 8 free printable time, money & measurement worksheet generators, from kindergarten to grade 5. New problems every click, answer key on page 2, print or save as PDF. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/",
+   "board": "Free Printable Math Worksheets",
+   "keywords": [
+    "time, money & measurement worksheets",
     "free printable math worksheets",
     "math practice",
     "elementary math",
@@ -627,6 +688,21 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/telling-time-five-minutes.jpg",
+   "title": "Telling Time to 5 Minutes Worksheets – Free Printable with Answer Key",
+   "description": "Free printable telling time worksheets: read analog clocks to 5 minutes and write the time. New clocks every time, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/telling-time-five-minutes/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Telling time to 5 minutes",
+    "time, money & measurement worksheets",
+    "2nd to 3rd grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/two-digit-addition-with-regrouping.jpg",
    "title": "2-digit Addition with Regrouping Worksheets – Free Printable with Answer Key",
    "description": "Free printable 2-digit addition with regrouping worksheets. Every problem requires carrying. Random sheets, PDF printing and answer keys. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -702,6 +778,21 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/multiplying-by-10-100-1000.jpg",
+   "title": "Multiplying by 10, 100 and 1,000 Worksheets – Free Printable with Answer Key",
+   "description": "Free printable worksheets for multiplying whole numbers and decimals by 10, 100 and 1,000. Random problems with answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/decimals/multiplying-by-10-100-1000/",
+   "board": "Decimals Worksheets",
+   "keywords": [
+    "Multiplying by 10, 100 and 1,000",
+    "decimals worksheets",
+    "4th to 5th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/comparing-numbers.jpg",
    "title": "Comparing Numbers Worksheets – Free Printable with Answer Key",
    "description": "Printable comparing numbers worksheets with greater than, less than and equal signs. Numbers up to 9,999, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -726,6 +817,21 @@
     "Order of operations with parentheses",
     "pre-algebra worksheets",
     "5th to 6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/adding-money.jpg",
+   "title": "Adding Money Worksheets – Free Printable with Answer Key",
+   "description": "Free printable adding money worksheets with dollars and cents in column form. Random amounts up to $50, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/adding-money/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Adding money worksheets",
+    "time, money & measurement worksheets",
+    "2nd to 4th grade math",
     "free printable math worksheets",
     "math worksheets with answer key",
     "homeschool math"
@@ -807,6 +913,21 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/dividing-by-10-100-1000.jpg",
+   "title": "Dividing by 10, 100 and 1,000 Worksheets – Free Printable with Answer Key",
+   "description": "Printable worksheets for dividing whole numbers by 10, 100 and 1,000, with decimal answers. Random problems and answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/decimals/dividing-by-10-100-1000/",
+   "board": "Decimals Worksheets",
+   "keywords": [
+    "Dividing by 10, 100 and 1,000",
+    "decimals worksheets",
+    "5th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/expanded-form.jpg",
    "title": "Writing Numbers in Expanded Form Worksheets – Free Printable with Answer Key",
    "description": "Free printable expanded form worksheets: write 4-digit numbers as the sum of their place values. Random sheets with answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -831,6 +952,21 @@
     "Exponents worksheets",
     "pre-algebra worksheets",
     "5th to 6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/subtracting-money.jpg",
+   "title": "Subtracting Money Worksheets – Free Printable with Answer Key",
+   "description": "Printable subtracting money worksheets with dollars and cents in column form. Answers are never negative. Answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/subtracting-money/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Subtracting money worksheets",
+    "time, money & measurement worksheets",
+    "2nd to 4th grade math",
     "free printable math worksheets",
     "math worksheets with answer key",
     "homeschool math"
@@ -882,6 +1018,36 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/dividing-decimals-by-whole-numbers.jpg",
+   "title": "Dividing Decimals by Whole Numbers Worksheets – Free Printable with Answer Key",
+   "description": "Free printable worksheets for dividing a decimal by a one-digit whole number. Every quotient is exact. Answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/decimals/dividing-decimals-by-whole-numbers/",
+   "board": "Decimals Worksheets",
+   "keywords": [
+    "Dividing decimals by whole numbers",
+    "decimals worksheets",
+    "5th to 6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/greatest-common-factor.jpg",
+   "title": "Greatest Common Factor (GCF) Worksheets – Free Printable with Answer Key",
+   "description": "Free printable GCF worksheets: find the greatest common factor of two numbers up to 108. Random problems with answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/number-sense/greatest-common-factor/",
+   "board": "Number Sense Worksheets",
+   "keywords": [
+    "Greatest common factor (GCF)",
+    "number sense worksheets",
+    "5th to 6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/percent-of-a-number.jpg",
    "title": "Percent of a Number Worksheets – Free Printable with Answer Key",
    "description": "Printable worksheets for finding the percent of a number (like 25% of 80). Friendly numbers, random problems, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -891,6 +1057,21 @@
     "Percent of a number worksheets",
     "pre-algebra worksheets",
     "6th to 7th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/metric-conversions.jpg",
+   "title": "Metric Unit Conversions Worksheets – Free Printable with Answer Key",
+   "description": "Free printable metric conversion worksheets: km and m, m and cm, cm and mm, kg and g, L and mL. Random problems with answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/metric-conversions/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Metric unit conversions",
+    "time, money & measurement worksheets",
+    "4th to 5th grade math",
     "free printable math worksheets",
     "math worksheets with answer key",
     "homeschool math"
@@ -927,6 +1108,51 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/least-common-multiple.jpg",
+   "title": "Least Common Multiple (LCM) Worksheets – Free Printable with Answer Key",
+   "description": "Printable LCM worksheets: find the least common multiple of two numbers from 2 to 15. Random problems with answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/number-sense/least-common-multiple/",
+   "board": "Number Sense Worksheets",
+   "keywords": [
+    "Least common multiple (LCM)",
+    "number sense worksheets",
+    "5th to 6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/one-step-equations-addition-subtraction.jpg",
+   "title": "One-step Equations: Addition and Subtraction Worksheets – Free Printable with Answer Key",
+   "description": "Free printable one-step equation worksheets with addition and subtraction (x + 7 = 15, x − 4 = 9). Whole-number answers, answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/pre-algebra/one-step-equations-addition-subtraction/",
+   "board": "Pre-algebra Worksheets",
+   "keywords": [
+    "One-step equations: addition and subtraction",
+    "pre-algebra worksheets",
+    "6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/customary-conversions.jpg",
+   "title": "Customary Unit Conversions Worksheets – Free Printable with Answer Key",
+   "description": "Printable US customary conversion worksheets: feet and inches, yards, pounds and ounces, gallons, quarts, pints and cups. Answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/measurement/customary-conversions/",
+   "board": "Time, Money & Measurement Worksheets",
+   "keywords": [
+    "Customary unit conversions",
+    "time, money & measurement worksheets",
+    "4th to 5th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/multiplication-table-of-10.jpg",
    "title": "10 Times Table Worksheets – Free Printable with Answer Key",
    "description": "Free printable worksheets to practice the 10 times table (10 × 0 to 10 × 12). Random order, unlimited sheets, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -942,6 +1168,36 @@
    ]
   },
   {
+   "image": "https://mathlabs.pages.dev/pins/mixed-numbers-to-improper-fractions.jpg",
+   "title": "Mixed Numbers to Improper Fractions Worksheets – Free Printable with Answer Key",
+   "description": "Free printable worksheets for converting mixed numbers to improper fractions. Random problems with answer key, grades 4 to 5. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/fractions/mixed-numbers-to-improper-fractions/",
+   "board": "Fractions Worksheets",
+   "keywords": [
+    "Mixed numbers to improper fractions",
+    "fractions worksheets",
+    "4th to 5th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/one-step-equations-multiplication-division.jpg",
+   "title": "One-step Equations: Multiplication and Division Worksheets – Free Printable with Answer Key",
+   "description": "Printable one-step equation worksheets with multiplication and division (6x = 42, x ÷ 3 = 8). Whole-number answers and answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/pre-algebra/one-step-equations-multiplication-division/",
+   "board": "Pre-algebra Worksheets",
+   "keywords": [
+    "One-step equations: multiplication and division",
+    "pre-algebra worksheets",
+    "6th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
    "image": "https://mathlabs.pages.dev/pins/multiplication-table-of-11.jpg",
    "title": "11 Times Table Worksheets – Free Printable with Answer Key",
    "description": "Free printable worksheets to practice the 11 times table (11 × 0 to 11 × 12). Random order, unlimited sheets, answer key included. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
@@ -951,6 +1207,36 @@
     "11 times table worksheets",
     "multiplication worksheets",
     "3rd to 4th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/improper-fractions-to-mixed-numbers.jpg",
+   "title": "Improper Fractions to Mixed Numbers Worksheets – Free Printable with Answer Key",
+   "description": "Printable worksheets for converting improper fractions to mixed numbers. Random problems, answers in simplest form, answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/fractions/improper-fractions-to-mixed-numbers/",
+   "board": "Fractions Worksheets",
+   "keywords": [
+    "Improper fractions to mixed numbers",
+    "fractions worksheets",
+    "4th to 5th grade math",
+    "free printable math worksheets",
+    "math worksheets with answer key",
+    "homeschool math"
+   ]
+  },
+  {
+   "image": "https://mathlabs.pages.dev/pins/two-step-equations.jpg",
+   "title": "Two-step Equations Worksheets – Free Printable with Answer Key",
+   "description": "Free printable two-step equation worksheets (3x + 5 = 20, 4x − 7 = 13). Whole-number solutions, random problems, answer key. Click \"New sheet\" for fresh problems every time: unlimited free math practice for homework, morning work, math centers and homeschool. No sign-up.",
+   "link": "https://mathlabs.pages.dev/pre-algebra/two-step-equations/",
+   "board": "Pre-algebra Worksheets",
+   "keywords": [
+    "Two-step equations",
+    "pre-algebra worksheets",
+    "7th grade math",
     "free printable math worksheets",
     "math worksheets with answer key",
     "homeschool math"

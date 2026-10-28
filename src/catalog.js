@@ -15,9 +15,10 @@ const categories = [
   { slug: 'multiplication', name: 'Multiplication', blurb: 'Times tables 1 to 12, mixed facts and multi-digit long multiplication.' },
   { slug: 'division', name: 'Division', blurb: 'Division facts and long division, with or without remainders.' },
   { slug: 'fractions', name: 'Fractions', blurb: 'Simplifying, comparing, adding, subtracting, multiplying and dividing fractions.' },
-  { slug: 'decimals', name: 'Decimals', blurb: 'Adding, subtracting and multiplying decimals in column form.' },
-  { slug: 'number-sense', name: 'Number sense', blurb: 'Rounding, comparing numbers, expanded form and missing addends.' },
-  { slug: 'pre-algebra', name: 'Pre-algebra', blurb: 'Integers, order of operations, exponents and percentages.' }
+  { slug: 'decimals', name: 'Decimals', blurb: 'Adding, subtracting, multiplying and dividing decimals, and multiplying by 10, 100 and 1,000.' },
+  { slug: 'number-sense', name: 'Number sense', blurb: 'Rounding, comparing numbers, expanded form, missing addends, GCF and LCM.' },
+  { slug: 'pre-algebra', name: 'Pre-algebra', blurb: 'Integers, order of operations, exponents, percentages and equations.' },
+  { slug: 'measurement', name: 'Time, money & measurement', blurb: 'Telling time on a clock, adding and subtracting money, and converting units.' }
 ];
 
 const ADD_TIP = 'Have students say the carried digit out loud ("7 plus 5 is 12, write 2, carry 1") until it becomes automatic.';
@@ -652,6 +653,177 @@ const types = [
     intro: ['Percentages are chosen so that answers are whole numbers, which keeps the focus on the method: 10% is one tenth, 25% is one quarter, 50% is one half.'],
     tips: ['Find 10% first, then build other percentages from it.'],
     related: ['multiplying-decimals', 'multiplying-fractions']
+  },
+  // ---------------- Week 3 additions ----------------
+  ...[
+    [60, 'hour', 'to the hour', 'Kindergarten – Grade 1', 'Each clock shows an exact hour, so the long hand always points straight up at the 12. Students only need to read the short hand.', 'Ask: where is the long hand? If it points to 12, the time is “o’clock”.'],
+    [30, 'half-hour', 'to the half hour', 'Grade 1', 'Clocks show either an exact hour or half past the hour. At half past, the long hand points to the 6 and the short hand sits halfway between two numbers.', 'At half past, read the number the short hand has just passed, not the one it is moving toward.'],
+    [15, 'quarter-hour', 'to the quarter hour', 'Grade 2', 'Clocks show times on the hour, quarter past, half past and quarter to. The long hand points to the 12, 3, 6 or 9.', 'Link 15, 30 and 45 minutes to the 3, 6 and 9 on the clock face.'],
+    [5, 'five-minutes', 'to 5 minutes', 'Grade 2 – Grade 3', 'Times go up in steps of five minutes. Each number the long hand points to is worth five minutes: the 4 means 20 minutes, the 7 means 35 minutes.', 'Count by fives around the clock before starting the sheet.']
+  ].map(([step, slugPart, label, grade, intro, tip]) => ({
+    slug: `telling-time-${slugPart}`, cat: 'measurement', gen: 'clock', params: { step },
+    title: `Telling Time ${label.replace(/\b\w/g, (c) => c.toUpperCase())} Worksheets (Free Clocks)`,
+    h1: `Telling time ${label}`,
+    desc: `Free printable telling time worksheets: read analog clocks ${label} and write the time. New clocks every time, answer key included.`,
+    grade, cols: 4, counts: [8, 12, 16], count: 12,
+    instruction: 'Write the time shown on each clock.',
+    intro: [intro, 'Clock faces are drawn with all 60 minute marks, and the hour hand moves between numbers as it does on a real clock, so students learn to read its exact position.'],
+    tips: [tip, 'Use a real clock with movable hands for the first few problems.'],
+    related: ['telling-time-hour', 'telling-time-half-hour', 'telling-time-quarter-hour', 'telling-time-five-minutes'].filter((x) => x !== `telling-time-${slugPart}`)
+  })),
+  {
+    slug: 'adding-money', cat: 'measurement', gen: 'money', params: { op: '+', max: 50 },
+    title: 'Adding Money Worksheets (Dollars and Cents) – Free Printable',
+    h1: 'Adding money worksheets',
+    desc: 'Free printable adding money worksheets with dollars and cents in column form. Random amounts up to $50, answer key included.',
+    grade: 'Grade 2 – Grade 4', cols: 5, counts: [15, 20, 25], count: 20,
+    instruction: 'Add.',
+    intro: ['Amounts are written in dollars and cents, from $1.00 to $50.00, and lined up on the decimal point. Adding money is decimal addition with a real-life meaning.', 'Most problems need regrouping from cents into dollars.'],
+    tips: ['Remind students that 100 cents make one dollar, so a carry from the dimes column goes into the dollars.', 'Use play money for the first problems.'],
+    related: ['subtracting-money', 'adding-decimals']
+  },
+  {
+    slug: 'subtracting-money', cat: 'measurement', gen: 'money', params: { op: '−', max: 50 },
+    title: 'Subtracting Money Worksheets (Dollars and Cents) – Free',
+    h1: 'Subtracting money worksheets',
+    desc: 'Printable subtracting money worksheets with dollars and cents in column form. Answers are never negative. Answer key included.',
+    grade: 'Grade 2 – Grade 4', cols: 5, counts: [15, 20, 25], count: 20,
+    instruction: 'Subtract.',
+    intro: ['Each problem subtracts a smaller amount from a larger one, like working out the change after a purchase. Amounts are lined up on the decimal point.'],
+    tips: ['Check by adding the answer to the amount subtracted.'],
+    related: ['adding-money', 'subtracting-decimals']
+  },
+  {
+    slug: 'metric-conversions', cat: 'measurement', gen: 'convert', params: { system: 'metric' },
+    title: 'Metric Conversion Worksheets (km, m, cm, kg, L) – Free',
+    h1: 'Metric unit conversions',
+    desc: 'Free printable metric conversion worksheets: km and m, m and cm, cm and mm, kg and g, L and mL. Random problems with answer key.',
+    grade: 'Grade 4 – Grade 5', cols: 3, counts: [15, 21, 30], count: 21,
+    instruction: 'Fill in the missing number.',
+    intro: ['Every metric conversion multiplies or divides by 10, 100 or 1,000: 1 km = 1,000 m, 1 m = 100 cm, 1 cm = 10 mm, 1 kg = 1,000 g and 1 L = 1,000 mL. Problems go in both directions.'],
+    tips: ['Big unit to small unit: multiply. Small unit to big unit: divide.', 'Practise multiplying by 10, 100 and 1,000 first.'],
+    related: ['customary-conversions', 'multiplying-by-10-100-1000']
+  },
+  {
+    slug: 'customary-conversions', cat: 'measurement', gen: 'convert', params: { system: 'customary' },
+    title: 'Customary Unit Conversion Worksheets (ft, in, lb, oz) – Free',
+    h1: 'Customary unit conversions',
+    desc: 'Printable US customary conversion worksheets: feet and inches, yards, pounds and ounces, gallons, quarts, pints and cups. Answer key.',
+    grade: 'Grade 4 – Grade 5', cols: 3, counts: [15, 21, 30], count: 21,
+    instruction: 'Fill in the missing number.',
+    intro: ['US customary units use different factors: 1 ft = 12 in, 1 yd = 3 ft = 36 in, 1 lb = 16 oz, 1 gal = 4 qt, 1 qt = 2 pt and 1 pt = 2 cups. All answers are whole numbers.'],
+    tips: ['Keep a conversion chart on the desk until the factors are memorised.'],
+    related: ['metric-conversions']
+  },
+  {
+    slug: 'multiplying-by-10-100-1000', cat: 'decimals', gen: 'pow10', params: { op: '×' },
+    title: 'Multiplying by 10, 100 and 1,000 Worksheets – Free Printable',
+    h1: 'Multiplying by 10, 100 and 1,000',
+    desc: 'Free printable worksheets for multiplying whole numbers and decimals by 10, 100 and 1,000. Random problems with answer key.',
+    grade: 'Grade 4 – Grade 5', cols: 3, counts: [18, 24, 30], count: 24,
+    instruction: 'Multiply.',
+    intro: ['Multiplying by 10, 100 or 1,000 moves every digit one, two or three places to the left. Some problems use decimals such as 24.1 × 10, so the rule “add a zero” is not enough.'],
+    tips: ['Use a place value chart to show the digits moving, rather than the decimal point.'],
+    related: ['dividing-by-10-100-1000', 'metric-conversions']
+  },
+  {
+    slug: 'dividing-by-10-100-1000', cat: 'decimals', gen: 'pow10', params: { op: '÷' },
+    title: 'Dividing by 10, 100 and 1,000 Worksheets (Decimal Answers)',
+    h1: 'Dividing by 10, 100 and 1,000',
+    desc: 'Printable worksheets for dividing whole numbers by 10, 100 and 1,000, with decimal answers. Random problems and answer key.',
+    grade: 'Grade 5', cols: 3, counts: [18, 24, 30], count: 24,
+    instruction: 'Divide.',
+    intro: ['Dividing by 10, 100 or 1,000 moves every digit one, two or three places to the right, which often gives a decimal answer: 7,972 ÷ 100 = 79.72.'],
+    tips: ['Count the zeros in the divisor: that is how many places the digits move.'],
+    related: ['multiplying-by-10-100-1000', 'dividing-decimals-by-whole-numbers']
+  },
+  {
+    slug: 'dividing-decimals-by-whole-numbers', cat: 'decimals', gen: 'decDiv', params: { places: 1, maxQ: 99 },
+    title: 'Dividing Decimals by Whole Numbers Worksheets – Free Printable',
+    h1: 'Dividing decimals by whole numbers',
+    desc: 'Free printable worksheets for dividing a decimal by a one-digit whole number. Every quotient is exact. Answer key included.',
+    grade: 'Grade 5 – Grade 6', cols: 3, counts: [12, 18, 24], count: 18,
+    instruction: 'Divide. Show your work.',
+    intro: ['Each problem divides a number with one decimal place by a whole number from 2 to 9, and every division comes out exactly. Students divide as with whole numbers and place the decimal point in the quotient directly above the one in the dividend.'],
+    tips: ['Estimate first: 142.8 ÷ 3 is a little less than 150 ÷ 3 = 50.'],
+    related: ['dividing-by-10-100-1000', 'long-division-no-remainder']
+  },
+  {
+    slug: 'one-step-equations-addition-subtraction', cat: 'pre-algebra', gen: 'equation', params: { type: 'addsub' },
+    title: 'One-Step Equations (Addition & Subtraction) Worksheets – Free',
+    h1: 'One-step equations: addition and subtraction',
+    desc: 'Free printable one-step equation worksheets with addition and subtraction (x + 7 = 15, x − 4 = 9). Whole-number answers, answer key.',
+    grade: 'Grade 6', cols: 2, counts: [12, 16, 20], count: 16,
+    instruction: 'Solve for x.',
+    intro: ['Each equation needs one inverse operation: subtract to undo an addition, add to undo a subtraction. Every solution is a whole number from 0 to 60. One-step equations are a sixth-grade standard (Common Core 6.EE.B.7).'],
+    tips: ['Ask students to check each answer by putting it back into the equation.'],
+    related: ['one-step-equations-multiplication-division', 'missing-addends']
+  },
+  {
+    slug: 'one-step-equations-multiplication-division', cat: 'pre-algebra', gen: 'equation', params: { type: 'muldiv' },
+    title: 'One-Step Equations (Multiplication & Division) Worksheets',
+    h1: 'One-step equations: multiplication and division',
+    desc: 'Printable one-step equation worksheets with multiplication and division (6x = 42, x ÷ 3 = 8). Whole-number answers and answer key.',
+    grade: 'Grade 6', cols: 2, counts: [12, 16, 20], count: 16,
+    instruction: 'Solve for x.',
+    intro: ['Divide to undo a multiplication, multiply to undo a division. 6x means 6 × x. All solutions are whole numbers and rely on the times tables up to 12.'],
+    tips: ['Read 6x = 42 aloud as “6 times what is 42?”.'],
+    related: ['one-step-equations-addition-subtraction', 'two-step-equations']
+  },
+  {
+    slug: 'two-step-equations', cat: 'pre-algebra', gen: 'equation', params: { type: 'two' },
+    title: 'Two-Step Equations Worksheets – Free Printable With Answers',
+    h1: 'Two-step equations',
+    desc: 'Free printable two-step equation worksheets (3x + 5 = 20, 4x − 7 = 13). Whole-number solutions, random problems, answer key.',
+    grade: 'Grade 7', cols: 2, counts: [10, 14, 20], count: 14,
+    instruction: 'Solve for x. Show your steps.',
+    intro: ['Each equation has the form ax + b = c or ax − b = c. Students undo the addition or subtraction first, then the multiplication. All solutions are whole numbers. Two-step equations are a seventh-grade standard (Common Core 7.EE.B.4).'],
+    tips: ['Undo operations in the reverse order of the order of operations: first + or −, then × or ÷.'],
+    related: ['one-step-equations-multiplication-division', 'order-of-operations']
+  },
+  {
+    slug: 'mixed-numbers-to-improper-fractions', cat: 'fractions', gen: 'mixedNumbers', params: { to: 'improper', maxDen: 12, maxWhole: 9 },
+    title: 'Mixed Numbers to Improper Fractions Worksheets – Free',
+    h1: 'Mixed numbers to improper fractions',
+    desc: 'Free printable worksheets for converting mixed numbers to improper fractions. Random problems with answer key, grades 4 to 5.',
+    grade: 'Grade 4 – Grade 5', cols: 4, counts: [16, 20, 24], count: 20,
+    instruction: 'Write each mixed number as an improper fraction.',
+    intro: ['Multiply the whole number by the denominator, add the numerator, and keep the same denominator: 3 1/3 = (3 × 3 + 1)/3 = 10/3.'],
+    tips: ['Draw circles cut into equal parts for the first problems to show why it works.'],
+    related: ['improper-fractions-to-mixed-numbers', 'adding-fractions-like-denominators']
+  },
+  {
+    slug: 'improper-fractions-to-mixed-numbers', cat: 'fractions', gen: 'mixedNumbers', params: { to: 'mixed', maxDen: 12, maxWhole: 9 },
+    title: 'Improper Fractions to Mixed Numbers Worksheets – Free',
+    h1: 'Improper fractions to mixed numbers',
+    desc: 'Printable worksheets for converting improper fractions to mixed numbers. Random problems, answers in simplest form, answer key.',
+    grade: 'Grade 4 – Grade 5', cols: 4, counts: [16, 20, 24], count: 20,
+    instruction: 'Write each improper fraction as a mixed number.',
+    intro: ['Divide the numerator by the denominator: the quotient is the whole number and the remainder is the new numerator. 25/7 = 3 remainder 4, so 25/7 = 3 4/7.'],
+    tips: ['This is a division with remainder; review the division facts sheet if students are slow.'],
+    related: ['mixed-numbers-to-improper-fractions', 'simplifying-fractions']
+  },
+  {
+    slug: 'greatest-common-factor', cat: 'number-sense', gen: 'gcf', params: { maxG: 12 },
+    title: 'Greatest Common Factor (GCF) Worksheets – Free Printable',
+    h1: 'Greatest common factor (GCF)',
+    desc: 'Free printable GCF worksheets: find the greatest common factor of two numbers up to 108. Random problems with answer key.',
+    grade: 'Grade 5 – Grade 6', cols: 2, counts: [12, 16, 20], count: 16,
+    instruction: 'Find the greatest common factor.',
+    intro: ['The greatest common factor is the largest number that divides both numbers exactly. It is used to simplify fractions. Finding the GCF of two numbers up to 100 is a sixth-grade standard (Common Core 6.NS.B.4).'],
+    tips: ['List the factors of the smaller number first, from largest to smallest, and test each one on the larger number.'],
+    related: ['least-common-multiple', 'simplifying-fractions']
+  },
+  {
+    slug: 'least-common-multiple', cat: 'number-sense', gen: 'lcm', params: { max: 15 },
+    title: 'Least Common Multiple (LCM) Worksheets – Free Printable',
+    h1: 'Least common multiple (LCM)',
+    desc: 'Printable LCM worksheets: find the least common multiple of two numbers from 2 to 15. Random problems with answer key.',
+    grade: 'Grade 5 – Grade 6', cols: 2, counts: [12, 16, 20], count: 16,
+    instruction: 'Find the least common multiple.',
+    intro: ['The least common multiple is the smallest number that both numbers divide into exactly. It gives the least common denominator when adding fractions.'],
+    tips: ['List multiples of the larger number until one is also a multiple of the smaller number.'],
+    related: ['greatest-common-factor', 'adding-fractions-unlike-denominators']
   }
 ];
 

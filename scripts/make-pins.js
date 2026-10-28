@@ -31,7 +31,7 @@ if (!css) throw new Error('Run `node build.js` first.');
 const ACCENT = {
   addition: ['#4F46E5', '#8B5CF6'], subtraction: ['#0EA5E9', '#6366F1'], multiplication: ['#DB2777', '#8B5CF6'],
   division: ['#EA580C', '#DB2777'], fractions: ['#059669', '#0EA5E9'], decimals: ['#0891B2', '#4F46E5'],
-  'number-sense': ['#CA8A04', '#EA580C'], 'pre-algebra': ['#7C3AED', '#DB2777']
+  'number-sense': ['#CA8A04', '#EA580C'], 'pre-algebra': ['#7C3AED', '#DB2777'], measurement: ['#0D9488', '#CA8A04']
 };
 
 function sheetFor(slug) {
