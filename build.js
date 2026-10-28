@@ -54,13 +54,16 @@ function buildAssets() {
   const fontName = `/assets/inter.${crypto.createHash('sha256').update(font).digest('hex').slice(0, 10)}.woff2`;
   write(fontName, font);
   const css = fs.readFileSync(path.join(ROOT, 'src/styles.css'), 'utf8').replace('__INTER_WOFF2__', fontName);
-  const js = ['src/engine.js', 'src/app.js', 'src/ui.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const js = ['src/engine.js', 'src/app.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const ui = fs.readFileSync(path.join(ROOT, 'src/ui.js'), 'utf8');
   const cssName = `/assets/styles.${hash(css)}.css`;
   const jsName = `/assets/app.${hash(js)}.js`;
+  const uiName = `/assets/ui.${hash(ui)}.js`;
   write(cssName, css);
   write(jsName, js);
+  write(uiName, ui);
   write('/favicon.svg', FAVICON);
-  return { css: cssName, js: jsName, font: fontName };
+  return { css: cssName, js: jsName, ui: uiName, font: fontName };
 }
 
 const LOGO_MARK = (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>` +
@@ -134,7 +137,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : ''}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="${assets.font}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${assets.css}">
-${scripts ? '<script>document.documentElement.classList.add(\'js\')</script>' : ''}
+<script>document.documentElement.classList.add('js')</script>
 ${headExtra.join('\n')}
 ${ld}
 </head>
@@ -150,6 +153,7 @@ ${ld}
 ${body}
 </main>
 ${footer()}
+<script src="${assets.ui}" defer></script>
 ${scripts ? `<script src="${assets.js}" defer></script>` : ''}
 </body>
 </html>
@@ -198,6 +202,19 @@ function sampleSheets(slug, count, withKey) {
   return { seed, sheet: MSL.renderSheet(ct, problems, opts), key: withKey ? MSL.renderSheet(ct, problems, { ...opts, answers: true }) : '' };
 }
 
+function catCard(c, i = 0) {
+  const n = types.filter((t) => t.cat === c.slug).length;
+  return `<li class="cat-card reveal" style="--d:${i % 4}"><span class="cat-icon">${catIcon(c.slug)}</span><h3><a class="stretch" href="/${c.slug}/">${esc(c.name)}</a></h3><p>${esc(c.blurb)}</p><span class="cat-count">${n} worksheets ${ICON.arrow}</span></li>`;
+}
+
+// "Grade 3 – Grade 4" / "Kindergarten – Grade 1" → overall range of a list, e.g. "K–Grade 4".
+function gradeRange(list) {
+  const nums = list.flatMap((t) => (t.grade.match(/Kindergarten|\d+/g) || []).map((g) => (g === 'Kindergarten' ? 0 : +g)));
+  const lo = Math.min(...nums), hi = Math.max(...nums);
+  if (lo === hi) return lo === 0 ? 'Kindergarten' : `Grade ${lo}`;
+  return lo === 0 ? `K–Grade ${hi}` : `Grades ${lo}–${hi}`;
+}
+
 // ---------- pages ----------
 function homePage(assets) {
   const front = sampleSheets('multiplication-table-of-7', 15);
@@ -209,10 +226,7 @@ function homePage(assets) {
 <span class="stack-tag t1"><span class="ok">${ICON.check}</span>Answer key included</span>
 </div></div>`;
 
-  const catCards = categories.map((c, i) => {
-    const n = types.filter((t) => t.cat === c.slug).length;
-    return `<li class="cat-card reveal" style="--d:${i % 4}"><span class="cat-icon">${catIcon(c.slug)}</span><h3><a class="stretch" href="/${c.slug}/">${esc(c.name)}</a></h3><p>${esc(c.blurb)}</p><span class="cat-count">${n} worksheets ${ICON.arrow}</span></li>`;
-  }).join('');
+  const catCards = categories.map(catCard).join('');
 
   const demo = sampleSheets('three-digit-addition', 12, true);
   const groups = categories.map((c) => {
@@ -298,9 +312,16 @@ ${stack}
 function categoryPage(assets, c) {
   const list = types.filter((t) => t.cat === c.slug);
   const bc = crumbs([{ name: 'Home', path: '/' }, { name: c.name, path: `/${c.slug}/` }]);
+  const others = categories.filter((x) => x.slug !== c.slug);
   const body = `<section class="page-head dark ws-intro"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
-<h1>${esc(c.name)} worksheets</h1><p class="lead">${esc(c.blurb)} All ${list.length} worksheets below are free to print, generate new problems every time and include an answer key.</p></div></section>
-<div class="wrap page-body"><ul class="cards">${list.map(card).join('')}</ul></div>`;
+<div class="title-row"><span class="head-icon" aria-hidden="true">${catIcon(c.slug)}</span><h1>${esc(c.name)} worksheets</h1></div>
+<ul class="chips meta" aria-label="About these worksheets"><li>${ICON.grad}${esc(gradeRange(list))}</li><li>${list.length} worksheets</li><li>Free</li><li>Answer keys included</li></ul>
+<p class="lead">${esc(c.blurb)} All ${list.length} worksheets below are free to print, generate new problems every time and include an answer key.</p></div></section>
+<div class="wrap page-body"><ul class="cards">${list.map(card).join('')}</ul></div>
+<section class="section other-topics" aria-labelledby="other-h"><div class="wrap">
+<div class="section-head reveal"><p class="kicker">Keep practicing</p><h2 id="other-h">Other topics</h2></div>
+<ul class="cat-grid">${others.map(catCard).join('')}</ul>
+</div></section>`;
   const ld = [bc.ld, {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${c.name} worksheets`, url: abs(`/${c.slug}/`),
     hasPart: list.map((t) => ({ '@type': 'LearningResource', name: t.h1, url: abs(typeUrl(t)) }))
@@ -398,7 +419,7 @@ function contactLine() {
 
 function staticPages(assets) {
   const pages = [];
-  const page = (p, title, desc, h1, html) => pages.push({ p, html: layout(assets, { title: `${title} | ${config.name}`, desc, pathName: p, body: `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><h1>${esc(h1)}</h1></div></section><div class="wrap page-body"><article class="content">${html}</article></div>`, scripts: false }) });
+  const page = (p, title, desc, h1, html) => pages.push({ p, html: layout(assets, { title: `${title} | ${config.name}`, desc, pathName: p, body: `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><p class="kicker">${esc(config.name)}</p><h1>${esc(h1)}</h1></div></section><div class="wrap page-body"><article class="content paper">${html}</article></div>`, scripts: false }) });
 
   page('/about/', 'About', `About ${config.name}: free printable math worksheets generated in the browser.`, `About ${config.name}`, `
 <p>${esc(config.name)} is a free collection of math worksheet generators for parents, teachers, tutors and home-schoolers. Each page focuses on one precise skill, from addition within 10 to integers and percentages, and produces a new printable sheet with an answer key in one click.</p>
@@ -460,9 +481,10 @@ ${adsSection}
 }
 
 function notFoundPage(assets) {
-  const body = `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><h1>Page not found</h1></div></section><div class="wrap page-body"><article class="content">
-<p>Sorry, this page does not exist or has moved. You can find every worksheet on the <a href="/">home page</a>, or open a category:</p>
-<ul>${categories.map((c) => `<li><a href="/${c.slug}/">${esc(c.name)} worksheets</a></li>`).join('')}</ul></article></div>`;
+  const body = `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap"><p class="kicker">Error 404</p><h1>Page not found</h1>
+<p class="lead">Sorry, this page does not exist or has moved. You can find every worksheet on the home page, or open a category below.</p>
+<div class="hero-actions head-actions"><a class="btn btn-primary" href="/">Go to the home page ${ICON.arrow}</a><a class="btn btn-ghost" href="/#all">Browse all worksheets</a></div></div></section>
+<div class="wrap page-body"><ul class="cat-grid">${categories.map(catCard).join('')}</ul></div>`;
   return layout(assets, { title: `Page not found | ${config.name}`, desc: 'This page does not exist. Browse all free printable math worksheets from the home page or a category.', pathName: '/404.html', body, noindex: true, scripts: false });
 }
 
