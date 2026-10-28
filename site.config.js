@@ -53,5 +53,8 @@ module.exports = {
   analyticsToken: process.env.CF_ANALYTICS_TOKEN || '',
 
   // Optional Google Search Console HTML-tag verification token (content="..." value).
+  // Optional Pinterest "claim website" token (the content="..." value of the p:domain_verify tag).
+  pinterestVerification: process.env.PINTEREST_VERIFICATION || '',
+
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || 'deIIPbG75CvFmDynGaFyyoXJi-uRz0MJ2rIRozS6Trw'
 };

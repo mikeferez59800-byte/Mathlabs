@@ -136,6 +136,7 @@ function checkProblem(t, seed, p) {
       if (p.answer.n && (gcd(p.answer.n, p.answer.d) !== 1 || p.answer.n >= p.answer.d)) fail(t, seed, p, 'answer not simplified');
       if (t.gen === 'fracLike' && p.a[1] !== p.b[1]) fail(t, seed, p, 'denominators differ');
       if (t.gen === 'fracUnlike' && p.a[1] === p.b[1]) fail(t, seed, p, 'denominators equal');
+      if (t.params.op && t.params.op !== 'mix' && p.op !== t.params.op) fail(t, seed, p, `operation ${p.op} instead of ${t.params.op}`);
       break;
     }
     case 'fs':

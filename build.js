@@ -120,10 +120,19 @@ function ogImageFor(pathName) {
   return '';
 }
 
+// "Save to Pinterest" link with the vertical pin image rendered by scripts/make-pins.js (plain link,
+// no Pinterest script, so nothing third-party loads until the visitor clicks).
+function pinLink(t) {
+  if (!fs.existsSync(path.join(STATIC, 'pins', t.slug + '.jpg'))) return '';
+  const q = new URLSearchParams({ url: abs(typeUrl(t)), media: abs(`/pins/${t.slug}.jpg`), description: `${t.h1.charAt(0).toUpperCase() + t.h1.slice(1)} – free printable with answer key` });
+  return `<a class="btn btn-secondary" id="ws-pin" href="https://www.pinterest.com/pin/create/button/?${esc(q.toString())}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-6"/><path d="M8 3h8l-1 6 3 3v2H6v-2l3-3z"/></svg><span>Save<span class="hide-sm"> to Pinterest</span></span></a>`;
+}
+
 function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true, bodyClass = '' }) {
   const canonical = abs(pathName);
   const ogImage = ogImageFor(pathName);
   const headExtra = [];
+  if (config.pinterestVerification) headExtra.push(`<meta name="p:domain_verify" content="${esc(config.pinterestVerification)}">`);
   if (config.googleSiteVerification) headExtra.push(`<meta name="google-site-verification" content="${esc(config.googleSiteVerification)}">`);
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) headExtra.push(`<meta name="google-adsense-account" content="${esc(config.ads.client)}">`);
   if (config.analyticsToken) headExtra.push(`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='${JSON.stringify({ token: config.analyticsToken })}'></script>`);
@@ -392,6 +401,7 @@ function worksheetPage(assets, t) {
 <button type="button" class="btn btn-primary" id="ws-print">${icon('<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>')}<span>Print<span class="hide-sm"> / Save as PDF</span></span></button>
 <button type="button" class="btn btn-secondary" id="ws-new">${icon('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>')}<span>New<span class="hide-sm"> problems</span></span></button>
 <button type="button" class="btn btn-secondary" id="ws-copy">${icon('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>')}<span>Copy link<span class="visually-hidden"> to this sheet</span></span></button>
+${pinLink(t)}
 <p class="status" id="ws-status" role="status" aria-live="polite"></p>
 </div>
 <p class="seed"><span>Worksheet <span id="ws-seed">#${seed}</span>. The same link always gives the same problems.</span></p>

@@ -208,11 +208,14 @@
       return [rng.int(2, p.maxDen), rng.int(2, p.maxDen)];
     }, function (x) { return x[0] !== x[1]; });
     var op = p.op === 'mix' ? rng.pick(['+', '−']) : p.op;
-    var a = [rng.int(1, v[0] - 1), v[0]], b = [rng.int(1, v[1] - 1), v[1]];
-    var L = lcm(a[1], b[1]);
+    var L = lcm(v[0], v[1]);
+    // Equal fractions (1/3 and 2/6) would make a zero difference: redraw rather than switch the sign.
+    var ab = draw(function () {
+      return [[rng.int(1, v[0] - 1), v[0]], [rng.int(1, v[1] - 1), v[1]]];
+    }, function (x) { return op !== '−' || x[0][0] * L / x[0][1] !== x[1][0] * L / x[1][1]; });
+    var a = ab[0], b = ab[1];
     var an = a[0] * L / a[1], bn = b[0] * L / b[1];
     if (op === '−' && an < bn) { var t = a; a = b; b = t; t = an; an = bn; bn = t; }
-    if (op === '−' && an === bn) op = '+';
     var n = op === '+' ? an + bn : an - bn;
     return { kind: 'f', a: a, op: op, b: b, answer: mixed(n, L) };
   };
