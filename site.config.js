@@ -48,5 +48,5 @@ module.exports = {
   },
 
   // Optional Google Search Console HTML-tag verification token (content="..." value).
-  googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || ''
+  googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || 'deIIPbG75CvFmDynGaFyyoXJi-uRz0MJ2rIRozS6Trw'
 };
