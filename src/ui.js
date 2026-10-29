@@ -30,7 +30,7 @@
         if (e.key === 'Escape' && head.classList.contains('nav-open')) { setOpen(false); toggle.focus(); }
       });
       document.addEventListener('click', function (e) { if (!head.contains(e.target)) setOpen(false); });
-      window.addEventListener('resize', function () { if (window.innerWidth > 1100) setOpen(false); });
+      window.addEventListener('resize', function () { if (window.innerWidth > 1399) setOpen(false); });
     }
   }
 

@@ -15,6 +15,8 @@ const { categories, types } = require('./src/catalog');
 const MSL = require('./src/engine');
 const LAYOUT = require('./src/layout');
 const { explain } = require('./src/explain');
+const CHAMP = require('./src/championship/pages');
+const { T: CT } = require('./src/championship/i18n');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
@@ -66,7 +68,7 @@ function buildAssets() {
   write(jsName, js);
   write(uiName, ui);
   write('/favicon.svg', FAVICON);
-  return { css: cssName, js: jsName, ui: uiName, font: fontName };
+  return { css: cssName, js: jsName, ui: uiName, font: fontName, ...CHAMP.buildAssets({ ROOT, write, hash }) };
 }
 
 const LOGO_MARK = (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>` +
@@ -129,19 +131,28 @@ function pinLink(t) {
   return `<a class="btn btn-secondary" id="ws-pin" href="https://www.pinterest.com/pin/create/button/?${esc(q.toString())}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-6"/><path d="M8 3h8l-1 6 3 3v2H6v-2l3-3z"/></svg><span>Save<span class="hide-sm"> to Pinterest</span></span></a>`;
 }
 
-function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true, bodyClass = '' }) {
+function layout(assets, { title, desc, pathName, body, jsonld = [], noindex = false, scripts = true, bodyClass = '', lang = 'en', alternates = [], ogImage: ogOverride = '', css = [], js = [], champ = false }) {
   const canonical = abs(pathName);
-  const ogImage = ogImageFor(pathName);
+  const ogImage = ogOverride || ogImageFor(pathName);
+  const ch = CT[lang].chrome;
+  const champHome = (lang === 'en' ? '' : '/' + lang) + '/multiplication-championship/';
   const headExtra = [];
   if (config.pinterestVerification) headExtra.push(`<meta name="p:domain_verify" content="${esc(config.pinterestVerification)}">`);
   if (config.googleSiteVerification) headExtra.push(`<meta name="google-site-verification" content="${esc(config.googleSiteVerification)}">`);
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) headExtra.push(`<meta name="google-adsense-account" content="${esc(config.ads.client)}">`);
   if (config.analyticsToken) headExtra.push(`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='${JSON.stringify({ token: config.analyticsToken })}'></script>`);
+  // Championship pages are used by children: when ads are on, only non-personalised ads are requested there.
+  if (adsOn && champ) headExtra.push('<script>(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=1</script>');
   if (adsOn) headExtra.push(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(config.ads.client)}" crossorigin="anonymous"></script>`);
+  for (const a of alternates) headExtra.push(`<link rel="alternate" hreflang="${a.lang}" href="${esc(abs(a.path))}">`);
+  if (alternates.length) headExtra.push(`<link rel="alternate" hreflang="x-default" href="${esc(abs(alternates[0].path))}">`);
+  for (const href of css) headExtra.push(`<link rel="stylesheet" href="${href}">`);
   const ld = jsonld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('');
-  const nav = categories.map((c) => `<li><a href="/${c.slug}/"${pathName.startsWith('/' + c.slug + '/') ? ' aria-current="page"' : ''}>${esc(c.name)}</a></li>`).join('');
+  const catName = (c) => ch.cats[c.slug] || c.name;
+  const nav = `<li class="nav-champ"><a href="${champHome}"${pathName.includes('/multiplication-championship/') ? ' aria-current="page"' : ''}>${CHAMP.TROPHY}${esc(ch.championship)}</a></li>` +
+    categories.map((c) => `<li><a href="/${c.slug}/"${pathName.startsWith('/' + c.slug + '/') ? ' aria-current="page"' : ''}>${esc(catName(c))}</a></li>`).join('');
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -168,35 +179,37 @@ ${headExtra.join('\n')}
 ${ld}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">${esc(ch.skip)}</a>
 <header class="site-head" id="site-head"><div class="wrap head-row">
 <a class="logo" href="/" aria-label="${esc(config.name)} home">${LOGO('lg-h')}<span>MathSheet<b>Lab</b></span></a>
 <nav class="nav" id="site-nav" aria-label="Main"><ul>${nav}</ul></nav>
-<a class="btn btn-primary btn-sm head-cta" href="/#all">All worksheets</a>
-<button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span class="visually-hidden">Menu</span>${ICON.menu}${ICON.close}</button>
+<a class="btn btn-primary btn-sm head-cta" href="/#all">${esc(ch.allWorksheets)}</a>
+<button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span class="visually-hidden">${esc(ch.menu)}</span>${ICON.menu}${ICON.close}</button>
 </div></header>
 <main id="main">
 ${body}
 </main>
-${footer()}
+${footer(lang)}
 <script src="${assets.ui}" defer></script>
-${scripts ? `<script src="${assets.js}" defer></script>` : ''}
+${scripts ? `<script src="${assets.js}" defer></script>` : ''}${js.map((src) => `<script src="${src}" defer></script>`).join('')}
 </body>
 </html>
 `;
 }
 
-function footer() {
+function footer(lang = 'en') {
+  const ch = CT[lang].chrome;
   const cols = [
-    ['Worksheets', categories.slice(0, 4)],
-    ['More worksheets', categories.slice(4)]
-  ].map(([h, cats]) => `<div><h2>${h}</h2><ul>${cats.map((c) => `<li><a href="/${c.slug}/">${esc(c.name)}</a></li>`).join('')}</ul></div>`).join('');
+    [ch.footWorksheets, categories.slice(0, 4)],
+    [ch.footMore, categories.slice(4)]
+  ].map(([h, cats]) => `<div><h2>${esc(h)}</h2><ul>${cats.map((c) => `<li><a href="/${c.slug}/">${esc(ch.cats[c.slug] || c.name)}</a></li>`).join('')}</ul></div>`).join('');
   const privacyBtn = adsOn ? '<li><button type="button" class="linklike" onclick="(window.googlefc=window.googlefc||{}).callbackQueue=(window.googlefc.callbackQueue||[]);googlefc.callbackQueue.push(googlefc.showRevocationMessage)">Privacy &amp; cookie settings</button></li>' : '';
   return `<footer class="site-foot dark"><div class="glow" aria-hidden="true"></div><div class="wrap foot-grid">
-<div class="foot-brand"><a class="logo" href="/">${LOGO('lg-f')}<span>MathSheet<b>Lab</b></span></a><p>${esc(config.tagline)}. Answer keys included, no sign-up.</p></div>
+<div class="foot-brand"><a class="logo" href="/">${LOGO('lg-f')}<span>MathSheet<b>Lab</b></span></a><p>${lang === 'en' ? `${esc(config.tagline)}. Answer keys included, no sign-up.` : esc(ch.tagline)}</p></div>
 ${cols}
-<div><h2>Site</h2><ul><li><a href="/about/">About</a></li><li><a href="/contact/">Contact</a></li><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="/legal/">Legal notice</a></li>${privacyBtn}</ul></div>
-<p class="foot-note">Worksheets are generated in your browser and may be printed and copied freely for personal, home-school and classroom use. © ${new Date().getFullYear()} ${esc(config.name)}.</p>
+${CHAMP.footerColumn(lang)}
+<div><h2>${esc(ch.footSite)}</h2><ul><li><a href="/about/">${esc(ch.about)}</a></li><li><a href="/contact/">${esc(ch.contact)}</a></li><li><a href="/privacy/">${esc(ch.privacy)}</a></li><li><a href="/terms/">${esc(ch.terms)}</a></li><li><a href="/legal/">${esc(ch.legal)}</a></li>${privacyBtn}</ul></div>
+<p class="foot-note">${esc(ch.footNote)} © ${new Date().getFullYear()} ${esc(config.name)}.</p>
 </div></footer>`;
 }
 
@@ -323,6 +336,8 @@ ${stack}
 </div>
 </section>
 
+${CHAMP.homeSection()}
+
 <section class="section all" id="all" aria-labelledby="all-h">
 <div class="wrap">
 <div class="all-head"><div class="section-head"><p class="kicker">All worksheets</p><h2 id="all-h">Find the right worksheet</h2></div>
@@ -339,7 +354,7 @@ ${stack}
   return layout(assets, {
     title: `Free Printable Math Worksheets With Answer Keys | ${config.name}`,
     desc: `Generate free printable math worksheets: addition, subtraction, times tables, long division, fractions, decimals and more. Answer keys, unlimited sheets, no sign-up.`,
-    pathName: '/', body, jsonld: ld, bodyClass: 'home'
+    pathName: '/', body, jsonld: ld, bodyClass: 'home', css: [assets.champCss], js: [assets.champWidget]
   });
 }
 
@@ -351,7 +366,7 @@ function categoryPage(assets, c) {
 <div class="title-row"><span class="head-icon" aria-hidden="true">${catIcon(c.slug)}</span><h1>${esc(c.name)} worksheets</h1></div>
 <ul class="chips meta" aria-label="About these worksheets"><li>${ICON.grad}${esc(gradeRange(list))}</li><li>${list.length} worksheets</li><li>Free</li><li>Answer keys included</li></ul>
 <p class="lead">${esc(c.blurb)} All ${list.length} worksheets below are free to print, generate new problems every time and include an answer key.</p></div></section>
-<div class="wrap page-body"><ul class="cards">${list.map(card).join('')}</ul></div>
+<div class="wrap page-body"><ul class="cards">${list.map(card).join('')}</ul>${c.slug === 'multiplication' ? CHAMP.multBanner() : ''}</div>
 <section class="section other-topics" aria-labelledby="other-h"><div class="wrap">
 <div class="section-head reveal"><p class="kicker">Keep practicing</p><h2 id="other-h">Other topics</h2></div>
 <ul class="cat-grid">${others.map(catCard).join('')}</ul>
@@ -363,7 +378,7 @@ function categoryPage(assets, c) {
   return layout(assets, {
     title: `${c.name} Worksheets – Free Printable With Answer Keys | ${config.name}`.slice(0, 90),
     desc: `${list.length} free printable ${c.name.toLowerCase()} worksheets. ${c.blurb}`.slice(0, 160),
-    pathName: `/${c.slug}/`, body, jsonld: ld
+    pathName: `/${c.slug}/`, body, jsonld: ld, ...(c.slug === 'multiplication' ? { css: [assets.champCss] } : {})
   });
 }
 
@@ -422,6 +437,7 @@ ${pinLink(t)}
 </section>
 </div></div>
 <div class="wrap more">
+${t.cat === 'multiplication' ? CHAMP.multBanner('compact') : ''}
 ${adSlot('top')}
 <section class="content">
 <h2>About this worksheet</h2>
@@ -445,7 +461,7 @@ ${adSlot('bottom')}
     url: abs(typeUrl(t)), learningResourceType: 'Worksheet', educationalLevel: t.grade, inLanguage: 'en',
     isAccessibleForFree: true, about: c.name, publisher: { '@type': 'Organization', name: config.name, url: abs('/') }
   }];
-  return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar' });
+  return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar', ...(t.cat === 'multiplication' ? { css: [assets.champCss] } : {}) });
 }
 
 // One fully explained problem per page. Among a few candidates, take the one with the most steps
@@ -499,20 +515,22 @@ function staticPages(assets) {
 <p>You can learn how Google uses information from sites that use its services at <a href="https://policies.google.com/technologies/partner-sites" rel="noopener">policies.google.com/technologies/partner-sites</a> and opt out of personalised advertising at <a href="https://adssettings.google.com" rel="noopener">adssettings.google.com</a>.</p>`
     : `
 <h2>Cookies and advertising</h2>
-<p>This site currently sets no cookies and shows no advertising. If advertising is introduced in the future, this policy will be updated before it starts, and you will be asked for consent where the law requires it.</p>`;
+<p>This site currently shows no advertising and sets no advertising or tracking cookies. The only cookie is the strictly necessary sign-in cookie of the championship, set only if you create or restore a championship profile. If advertising is introduced in the future, this policy will be updated before it starts, and you will be asked for consent where the law requires it.</p>`;
 
   page('/privacy/', 'Privacy Policy', `Privacy policy of ${config.name}: what data is processed and why.`, 'Privacy policy', `
 <p>Last updated: ${today}.</p>
 <h2>Summary</h2>
 <p>${esc(config.name)} does not require an account and does not ask for your name, email or any other personal information. Worksheets are generated entirely in your browser; the options you choose and any title you type stay on your device and are only placed in the page address so the link can reproduce the sheet.</p>
+<p>The optional <a href="/multiplication-championship/">Multiplication World Championship</a> works with a nickname and a country only; see the section about it below.</p>
 <h2>Hosting, server logs and visit statistics</h2>
 <p>The site is hosted by ${esc(config.host.name)}. Like any web host, it processes technical data such as your IP address, browser type and the pages requested, in order to deliver the site and protect it against abuse. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare’s privacy policy</a>.</p>
 <p>To know which worksheets are useful, we count visits with Cloudflare Web Analytics. It does not use cookies, does not store anything on your device and does not track you across websites; we only see aggregated numbers such as page views per page and per country.</p>
 ${adsSection}
+${CHAMP.privacySection()}
 <h2>Your rights</h2>
 <p>Depending on where you live (for example under the EU/UK GDPR or US state privacy laws) you may have rights to access, correct or delete personal data, or to object to its processing. Since this site does not itself store personal data about visitors, most requests concern our providers listed above. You can also contact us: ${contactLine()}.</p>
 <h2>Children</h2>
-<p>The worksheets are intended to be chosen and printed by adults (parents, teachers, tutors). The site does not knowingly collect personal information from children.</p>
+<p>The worksheets are intended to be chosen and printed by adults (parents, teachers, tutors). The championship can be played by children: it asks for no e-mail address, no real name and no precise location, has no chat or messaging, and shows no advertising during a game. Children under 13 (or under the age set by the law of their country) should ask a parent or teacher before creating a championship profile. A parent may delete the profile at any time from the “My profile” page, or ask us to do it.</p>
 <h2>Changes</h2><p>We will update this page whenever the way the site works changes.</p>`);
 
   page('/terms/', 'Terms of Use', `Terms of use of ${config.name}: how you may print, copy and share the free math worksheets generated on this site.`, 'Terms of use', `
@@ -570,6 +588,10 @@ const HEADERS = `/*
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/multiplication-championship/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
 `;
 
 // ---------- main ----------
@@ -583,13 +605,19 @@ function main() {
   add('/', homePage(assets));
   for (const c of categories) add(`/${c.slug}/`, categoryPage(assets, c));
   for (const t of types) add(typeUrl(t), worksheetPage(assets, t));
+  for (const e of CHAMP.buildPages({ assets, layout, write, abs, esc, crumbs, adSlot, config, ICON })) {
+    write(e.p + 'index.html', e.html);
+    if (e.index) entries.push({ p: e.p, html: e.html });
+  }
   const legal = staticPages(assets);
   for (const p of legal) entries.push({ p, html: fs.readFileSync(path.join(DIST, p, 'index.html'), 'utf8') });
   write('/404.html', notFoundPage(assets));
 
   write('/sitemap.xml', sitemap(entries));
-  write('/robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${abs('/sitemap.xml')}\n`);
+  write('/robots.txt', `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /multiplication-championship/admin/\n\nSitemap: ${abs('/sitemap.xml')}\n`);
   write('/_headers', HEADERS);
+  // Only the championship API runs as a Pages Function; every page stays a free static request.
+  write('/_routes.json', JSON.stringify({ version: 1, include: ['/api/*'], exclude: [] }, null, 2) + '\n');
   if (fs.existsSync(STATIC)) fs.cpSync(STATIC, DIST, { recursive: true });
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) {
     write('/ads.txt', `google.com, ${config.ads.client.replace('ca-', '')}, DIRECT, f08c47fec0942fa0\n`);

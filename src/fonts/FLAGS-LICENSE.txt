@@ -1,0 +1,6 @@
+TwemojiCountryFlags.woff2 — country flag emoji font used by the Multiplication World Championship
+(only for flag characters, so flags also display on Windows, which has no flag emoji).
+
+Source: country-flag-emoji-polyfill by TalkJS (https://github.com/talkjs/country-flag-emoji-polyfill), MIT License.
+Flag artwork: Twemoji by Twitter, Inc. and other contributors (https://github.com/twitter/twemoji),
+licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).

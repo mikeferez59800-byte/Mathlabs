@@ -39,7 +39,7 @@ for (const file of files) {
   if (!/<link rel="canonical" href="[^"]+"/.test(html)) errors.push(`${rel}: missing canonical`);
   const h1 = (html.match(/<h1[\s>]/g) || []).length;
   if (h1 !== 1) errors.push(`${rel}: ${h1} <h1> elements`);
-  if (!/<html lang="en">/.test(html)) errors.push(`${rel}: missing lang`);
+  if (!/<html lang="(en|fr|ja)">/.test(html)) errors.push(`${rel}: missing lang`);
   for (const m of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     const u = m[1];
     if (/^(https?:|mailto:|#|data:)/.test(u)) continue;
