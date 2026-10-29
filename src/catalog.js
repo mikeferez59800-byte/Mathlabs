@@ -4,8 +4,9 @@
  * then run `node build.js`. The sitemap, home page and category pages update automatically.
  *
  * Fields: slug, cat, title (<title>), h1, desc (meta description), grade, gen, params,
- * cols (problems per row when printed), counts (choices), count (default),
- * instruction (printed on the sheet), intro (paragraphs), tips (list), related (slugs).
+ * cols (preferred problems per row; src/layout.js adapts it to the page), counts (choices), count (default),
+ * instruction (printed on the sheet), intro (paragraphs), tips (list), related (slugs),
+ * layout (optional: force a layout family 'A'..'F', otherwise chosen from the problems).
  */
 'use strict';
 
@@ -611,7 +612,7 @@ const types = [
     related: ['multiplying-integers']
   },
   {
-    slug: 'order-of-operations', cat: 'pre-algebra', gen: 'orderOps', params: { parens: false },
+    slug: 'order-of-operations', cat: 'pre-algebra', gen: 'orderOps', layout: 'C', params: { parens: false },
     title: 'Order of Operations Worksheets (No Parentheses) – Free',
     h1: 'Order of operations worksheets',
     desc: 'Free printable order of operations worksheets without parentheses. Practice multiplication and division before addition and subtraction.',
@@ -622,7 +623,7 @@ const types = [
     related: ['order-of-operations-with-parentheses', 'exponents']
   },
   {
-    slug: 'order-of-operations-with-parentheses', cat: 'pre-algebra', gen: 'orderOps', params: { parens: true },
+    slug: 'order-of-operations-with-parentheses', cat: 'pre-algebra', gen: 'orderOps', layout: 'C', params: { parens: true },
     title: 'Order of Operations With Parentheses Worksheets – Free',
     h1: 'Order of operations with parentheses',
     desc: 'Printable order of operations worksheets with parentheses. Random expressions, whole-number answers, answer key included.',

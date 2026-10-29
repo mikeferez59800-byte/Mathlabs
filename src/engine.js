@@ -92,6 +92,7 @@
   // fraction:   { kind:'f', a:[n,d], op, b:[n,d], answer:{n,d,w} | string }
   // fsimp:      { kind:'fs', a:[n,d], answer:[n,d] }
   // fcmp:       { kind:'fc', a:[n,d], b:[n,d], answer:'<'|'>'|'=' }
+  // word:       { kind:'wp', text, answer, unit? }  (layout family E; no generator yet)
 
   var G = {};
 
@@ -514,6 +515,9 @@
       case 'fm':
         return '<div class="ph pf">' + (p.a.w !== undefined ? mixedHtml(p.a) : frac(p.a)) + '<span class="op">=</span>' +
           (withAnswer ? '<span class="ans">' + answerHtml(p) + '</span>' : '<span class="blank"></span>') + '</div>';
+      case 'wp':
+        return '<div class="pwp"><p class="pwp-text">' + esc(p.text) + '</p><span class="pwp-ans">Answer: ' +
+          (withAnswer ? '<span class="ans">' + esc(p.answer) + '</span>' : '<span class="blank lg"></span>') + (p.unit ? ' ' + esc(p.unit) : '') + '</span></div>';
       case 'clk':
         return '<div class="pclk">' + clockSvg(p.h, p.m) + '<span class="clk-ans">' +
           (withAnswer ? '<span class="ans">' + esc(p.answer) + '</span>' : '<span class="blank sm"></span> : <span class="blank sm"></span>') + '</span></div>';
@@ -528,20 +532,10 @@
     }
   }
 
+  // Sheets and pages are drawn by layout.js (window.MSL.layout in the browser).
   function renderSheet(type, problems, o) {
-    o = o || {};
-    var cols = o.cols || type.cols || 4;
-    var title = esc(o.title || type.sheetTitle || type.h1);
-    var head = '<header class="sh-head"><div class="sh-title">' + title + (o.answers ? ' <span class="sh-key">Answer key</span>' : '') + '</div>' +
-      (o.answers ? '' : '<div class="sh-fields"><span>Name: <i></i></span><span>Date: <i></i></span><span>Score: <i class="short"></i> / ' + problems.length + '</span></div>') +
-      (type.instruction && !o.answers ? '<p class="sh-ins">' + esc(type.instruction) + '</p>' : '') +
-      '</header>';
-    var items = problems.map(function (p, i) {
-      return '<li class="pr pr-' + p.kind + '"><span class="pn">' + (i + 1) + '.</span>' + problemHtml(p, !!o.answers) + '</li>';
-    }).join('');
-    var foot = '<footer class="sh-foot"><span>' + esc(o.siteName || '') + '</span><span>Worksheet #' + (o.seed || '') + '</span></footer>';
-    return '<div class="sheet' + (o.answers ? ' sheet-key' : '') + (o.large ? ' sheet-lg' : '') + '" style="--cols:' + cols + '">' +
-      head + '<ol class="sh-grid">' + items + '</ol>' + foot + '</div>';
+    var layout = typeof module !== 'undefined' && module.exports ? require('./layout') : root.MSL.layout;
+    return layout.renderSheet(type, problems, o);
   }
 
   var api = {

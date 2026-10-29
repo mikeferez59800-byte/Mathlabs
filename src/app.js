@@ -30,11 +30,15 @@
     form.title.value = state.title;
     form.paper.value = state.paper;
 
-    // The server-rendered sheet already matches the default seed; only re-render if needed.
-    var isDefault = state.seed === cfg.defaultSeed && state.count === type.count && !state.large && !state.title;
-    if (!isDefault || !state.answers) render(false);
+    // The server-rendered sheet already matches the default seed on US Letter; only re-render if needed.
+    var isDefault = state.seed === cfg.defaultSeed && state.count === type.count && !state.large && !state.title && state.paper === 'letter';
     applyPaper();
+    if (!isDefault || !state.answers) render(false);
+    else afterRender();
     updateSeedLabel();
+    window.addEventListener('resize', debounce(fitToScreen, 150));
+    // Re-check the layout once the sheet font has loaded (sizes are computed for it).
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(checkFit);
 
     form.addEventListener('change', function (e) {
       if (e.target.name === 'title') return;
@@ -49,7 +53,10 @@
       render(true);
       announce('New worksheet generated.');
     });
-    document.getElementById('ws-print').addEventListener('click', function () { window.print(); });
+    document.getElementById('ws-print').addEventListener('click', function () {
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { window.print(); });
+      else window.print();
+    });
     document.getElementById('ws-copy').addEventListener('click', function () {
       var url = location.href;
       if (navigator.clipboard && window.isSecureContext) {
@@ -67,19 +74,51 @@
       applyPaper();
     }
 
-    function render(updateUrl) {
+    function render(updateUrl, shrink) {
       try {
         var problems = window.MSL.generate(type, state.seed, state.count);
-        var opts = { title: state.title || type.sheetTitle, seed: state.seed, siteName: cfg.siteName, large: state.large, cols: type.cols };
-        var html = window.MSL.renderSheet(type, problems, opts);
-        if (state.answers) html += window.MSL.renderSheet(type, problems, Object.assign({}, opts, { answers: true }));
-        out.innerHTML = html;
+        var opts = {
+          title: state.title || type.sheetTitle, seed: state.seed, siteName: cfg.siteName, siteHost: cfg.siteHost,
+          cols: type.cols, paper: state.paper, style: state.large ? 'primary' : 'classic', answers: state.answers, shrink: shrink
+        };
+        out.innerHTML = window.MSL.layout.renderWorksheet(type, problems, opts);
+        state.shrink = shrink || 1;
+        out.setAttribute('data-shrink', String(state.shrink));
         if (updateUrl) syncUrl();
         updateSeedLabel();
+        afterRender();
       } catch (err) {
         out.innerHTML = '<p class="error" role="alert">Sorry, this worksheet could not be generated. Please reload the page. If the problem continues, the error was: ' +
           String(err && err.message || err).replace(/</g, '&lt;') + '</p>';
       }
+    }
+
+    function afterRender() {
+      fitToScreen();
+      checkFit();
+    }
+
+    // Safety net: the layout is computed for the sheet font; if a browser still draws a problem
+    // wider or taller than its cell, redraw slightly smaller (never hide anything).
+    function checkFit() {
+      var bad = Array.prototype.some.call(out.querySelectorAll('.sheet.pg .pr'), function (li) {
+        return li.scrollWidth > li.clientWidth + 1 || li.scrollHeight > li.clientHeight + 1;
+      }) || Array.prototype.some.call(out.querySelectorAll('.sheet.pg'), function (pg) {
+        return pg.scrollHeight > pg.clientHeight + 1;
+      });
+      var shrink = state.shrink || 1;
+      if (bad && shrink > 0.75) render(false, Math.round(shrink * 0.94 * 100) / 100);
+    }
+
+    // Pages are drawn at their real paper size; on narrow screens they are scaled down to fit.
+    function fitToScreen() {
+      var sheets = out.querySelectorAll('.sheet.pg');
+      if (!sheets.length) return;
+      Array.prototype.forEach.call(sheets, function (s) { s.style.zoom = ''; });
+      var avail = out.clientWidth - 2;
+      var w = sheets[0].offsetWidth;
+      var k = w > avail ? Math.max(0.3, avail / w) : 1;
+      if (k < 1) Array.prototype.forEach.call(sheets, function (s) { s.style.zoom = String(Math.floor(k * 1000) / 1000); });
     }
 
     function syncUrl() {
@@ -96,7 +135,7 @@
     function applyPaper() {
       var el = document.getElementById('page-size');
       if (!el) { el = document.createElement('style'); el.id = 'page-size'; document.head.appendChild(el); }
-      el.textContent = '@page{size:' + (state.paper === 'a4' ? 'A4' : 'letter') + ';margin:12mm}';
+      el.textContent = '@page{size:' + (state.paper === 'a4' ? 'A4' : 'letter') + ';margin:0}';
     }
 
     function updateSeedLabel() { seedLabel.textContent = '#' + state.seed; }
