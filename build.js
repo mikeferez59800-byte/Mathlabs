@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const config = require('./site.config');
 const { categories, types } = require('./src/catalog');
 const MSL = require('./src/engine');
+const LAYOUT = require('./src/layout');
 const { explain } = require('./src/explain');
 
 const ROOT = __dirname;
@@ -56,7 +57,7 @@ function buildAssets() {
   const fontName = `/assets/inter.${crypto.createHash('sha256').update(font).digest('hex').slice(0, 10)}.woff2`;
   write(fontName, font);
   const css = fs.readFileSync(path.join(ROOT, 'src/styles.css'), 'utf8').replace('__INTER_WOFF2__', fontName);
-  const js = ['src/engine.js', 'src/app.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const js = ['src/engine.js', 'src/layout.js', 'src/app.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
   const ui = fs.readFileSync(path.join(ROOT, 'src/ui.js'), 'utf8');
   const cssName = `/assets/styles.${hash(css)}.css`;
   const jsName = `/assets/app.${hash(js)}.js`;
@@ -215,7 +216,15 @@ function card(t, i = 0) {
 }
 
 function clientTypeOf(t) {
-  return { slug: t.slug, gen: t.gen, params: t.params, cols: t.cols, counts: t.counts, count: t.count, h1: t.h1, sheetTitle: t.h1.charAt(0).toUpperCase() + t.h1.slice(1), instruction: t.instruction };
+  return { slug: t.slug, gen: t.gen, params: t.params, cols: t.cols, counts: t.counts, count: t.count, h1: t.h1, sheetTitle: sheetTitle(t), instruction: t.instruction, grade: t.grade, layout: t.layout };
+}
+
+const siteHost = () => new URL(config.url).host;
+
+// Title printed on the sheet: the page heading without the trailing "worksheets" (SEO wording).
+function sheetTitle(t) {
+  const s = t.h1.replace(/\s+worksheets?$/i, '');
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // A real sheet from the engine (same output as the generator page), used as an illustration.
@@ -363,8 +372,8 @@ function worksheetPage(assets, t) {
   const seed = MSL.hashString(t.slug);
   const clientType = clientTypeOf(t);
   const problems = MSL.generate(clientType, seed, t.count);
-  const sheetOpts = { seed, siteName: config.name, cols: t.cols, title: clientType.sheetTitle };
-  const sheets = MSL.renderSheet(clientType, problems, sheetOpts) + MSL.renderSheet(clientType, problems, { ...sheetOpts, answers: true });
+  const sheetOpts = { seed, siteName: config.name, siteHost: siteHost(), cols: t.cols, title: clientType.sheetTitle, paper: 'letter', answers: true };
+  const sheets = LAYOUT.renderWorksheet(clientType, problems, sheetOpts);
   const bc = crumbs([{ name: 'Home', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: t.h1, path: typeUrl(t) }]);
   const siblings = types.filter((x) => x.cat === t.cat && x.slug !== t.slug);
   const related = (t.related || []).map((s) => typeBySlug[s]);
@@ -429,7 +438,7 @@ ${related.length ? `<section class="related"><h2>Related worksheets</h2><ul>${re
 ${siblings.length ? `<section class="related"><h2>More ${esc(c.name.toLowerCase())} worksheets</h2><ul>${siblings.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${adSlot('bottom')}
 </div>
-<script type="application/json" id="ws-config">${JSON.stringify({ type: clientType, defaultSeed: seed, siteName: config.name }).replace(/</g, '\\u003c')}</script>`;
+<script type="application/json" id="ws-config">${JSON.stringify({ type: clientType, defaultSeed: seed, siteName: config.name, siteHost: siteHost() }).replace(/</g, '\\u003c')}</script>`;
 
   const ld = [bc.ld, {
     '@context': 'https://schema.org', '@type': 'LearningResource', name: clientType.sheetTitle, description: t.desc,

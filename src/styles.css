@@ -1,7 +1,7 @@
 /* MathSheetLab styles: "Premium Hybrid" design system.
  * Two universes share one set of components: dark immersive sections (.dark: hero, page heads, footer)
- * and light functional ones (generators, lists, text). The printable sheet rules and the print
- * stylesheet at the end are kept as they were: only the screen interface was redesigned. */
+ * and light functional ones (generators, lists, text). The printable sheet and the print
+ * stylesheet at the end follow the worksheet layout engine (src/layout.js). */
 
 @font-face {
   font-family: "Inter";
@@ -53,7 +53,7 @@
 
   /* Type */
   --font: "Inter", "Inter Fallback", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --sheet-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sheet-font: "Inter", "Inter Fallback", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --fs-hero: clamp(2.5rem, 1.35rem + 4.2vw, 4.5rem);
   --fs-h1: clamp(2rem, 1.5rem + 1.9vw, 3rem);
@@ -568,90 +568,126 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
 }
 
-/* ---------- The printable sheet ---------- */
+/* ---------- The printable sheet ----------
+ * One design for every worksheet. src/layout.js computes, for each page, the columns (--cols),
+ * rows (--rows), problem font size (--fs) and title size (--tfs), and the page size (--pw, --ph).
+ * Fixed heights below (brand 12pt, title line 1.25, instruction 15pt, fields 26pt, rule 14pt,
+ * footer 24pt) are the values layout.js counts on: change them together.
+ * Black and white friendly: thin rules only, no filled areas. */
 .sheet-wrap { overflow-x: auto; }
 .sheet {
-  --cols: 4;
+  --cols: 4; --fs: 1.15rem; --tfs: 1.3rem;
   background: #fff; color: #111; border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--shadow);
   padding: 28px 32px; margin: 0 auto 24px; max-width: 820px; font-family: var(--sheet-font);
-  line-height: 1.6; letter-spacing: normal; -webkit-font-smoothing: auto;
+  font-variant-numeric: tabular-nums; line-height: 1.3; letter-spacing: normal; -webkit-font-smoothing: auto;
 }
-.sh-head { border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 18px; }
-.sh-title { font-size: 1.3rem; font-weight: 700; }
-.sh-key { font-size: .85rem; font-weight: 600; background: #111; color: #fff; padding: 2px 8px; border-radius: 4px; vertical-align: middle; margin-left: 6px; }
-.sh-fields { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 10px; font-size: .95rem; }
-.sh-fields span { display: inline-flex; align-items: flex-end; gap: 6px; }
-.sh-fields i { display: inline-block; width: 160px; border-bottom: 1px solid #111; height: 1.1em; }
-.sh-fields i.short { width: 40px; }
-.sh-ins { margin: 10px 0 0; font-style: italic; font-size: .95rem; }
-.sh-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 22px 18px; }
-.pr { display: flex; gap: 6px; align-items: flex-start; break-inside: avoid; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
-.pn { font-size: .78rem; color: #555; min-width: 1.8em; padding-top: .25em; }
-.sheet-lg .pr { font-size: 1.45rem; }
-.sh-foot { display: flex; justify-content: space-between; margin-top: 22px; padding-top: 8px; border-top: 1px solid #ccc; font-size: .75rem; color: #666; }
+.sh-head { border-bottom: 1.25pt solid #111; padding-bottom: 6pt; margin-bottom: 8pt; }
+.sh-brand { display: flex; justify-content: space-between; height: 12pt; font-size: 7.5pt; line-height: 9pt; color: #555; text-transform: uppercase; letter-spacing: .08em; }
+.sh-logo { font-weight: 700; color: #111; }
+.sh-logo::before { content: ""; display: inline-block; width: 7pt; height: 7pt; margin-right: 4pt; border: 1.25pt solid #111; border-radius: 2pt; vertical-align: -1pt; box-sizing: border-box;
+  background: linear-gradient(#111, #111) center / 4pt 1pt no-repeat, linear-gradient(#111, #111) center / 1pt 4pt no-repeat; }
+.sh-title { font-size: var(--tfs); line-height: 1.25; font-weight: 700; letter-spacing: -.01em; }
+.sh-key { display: inline-block; margin-left: 8pt; padding: 0 5pt; border: 1pt solid #111; border-radius: 3pt; font-size: 8pt; line-height: 13pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; vertical-align: 3pt; }
+.sh-more { font-size: 9pt; font-weight: 400; color: #555; }
+.sh-ins { margin: 0; font-style: italic; font-size: 10.5pt; line-height: 15pt; }
+.sh-fields { display: flex; gap: 0 18pt; height: 26pt; align-items: flex-end; font-size: 10pt; line-height: 14pt; }
+.sh-fields span { display: inline-flex; align-items: flex-end; gap: 5pt; white-space: nowrap; }
+.sh-fields .f-name { flex: 1 1 auto; }
+.sh-fields .f-name i { flex: 1 1 auto; }
+.sh-fields i { display: inline-block; width: 110pt; border-bottom: .75pt solid #111; height: 12pt; }
+.sh-fields i.short { width: 32pt; }
+.sh-cont .sh-title { font-size: 12pt; }
+.sh-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 1.1em 1.4em; font-size: var(--fs); }
+.pr { display: flex; gap: .35em; align-items: flex-start; min-width: 0; break-inside: avoid; }
+.pn { flex: 0 0 2.6em; font-size: .62em; line-height: 2.75; color: #555; text-align: right; font-weight: 600; }
+.pb { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.sheet-lg .sh-grid { font-size: 1.45rem; }
+.sh-foot { display: flex; justify-content: space-between; gap: 12pt; height: 24pt; box-sizing: border-box; padding-top: 6pt; margin-top: auto; border-top: .5pt solid #999; font-size: 7.5pt; line-height: 10pt; color: #555; }
+.sh-foot span { flex: 1 1 0; }
+.sh-foot span:nth-child(2) { text-align: center; }
+.sh-foot span:last-child { text-align: right; }
 
-/* Vertical (column) problems */
-.pv { display: inline-grid; justify-items: end; font-family: var(--mono); line-height: 1.35; min-width: 4.5ch; }
-.pv-b { display: flex; gap: .6ch; }
+/* Vertical (column) problems: room above for carried digits */
+.pv { display: inline-grid; justify-items: end; align-self: flex-start; line-height: 1.35; min-width: 3.5ch; padding-top: .6em; }
+.pv-b { display: flex; gap: .4em; }
 .pv-op { margin-right: auto; }
-.pv-line { width: 100%; border-top: 2px solid #111; margin-top: 2px; }
+.pv-line { width: 100%; border-top: 1.5pt solid #111; margin-top: 1pt; }
 .pv-ans { min-height: 1.6em; padding-top: 2px; }
 .sheet-key .pv-ans { color: #0b6b4f; font-weight: 700; }
 
 /* Horizontal problems */
-.ph { display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; gap: .35em; line-height: 1.6; }
-.blank { display: inline-block; flex: 0 0 auto; width: 2.8em; border-bottom: 1.5px solid #111; height: 1.2em; }
+.ph { display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; gap: .35em; line-height: 1.7; }
+.blank { display: inline-block; flex: 0 0 auto; width: 2.8em; border-bottom: 1pt solid #111; height: 1.2em; }
 .blank.sm { width: 2.4em; }
+.blank.lg { width: 8em; }
 .ans { color: #0b6b4f; font-weight: 700; }
-.ans.fill { display: inline-block; min-width: 2em; text-align: center; border-bottom: 1.5px solid #111; }
+.ans.fill { display: inline-block; min-width: 2em; text-align: center; border-bottom: 1pt solid #111; }
 .ph sup { font-size: .65em; }
 
 /* Fractions */
-.pf { gap: .45em; }
+.pf { gap: .45em; line-height: 1.1; min-height: 2.6em; }
 .fr { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.1; vertical-align: middle; font-variant-numeric: tabular-nums; }
-.fr-n { border-bottom: 1.5px solid currentColor; padding: 0 .2em; }
+.fr-n { border-bottom: 1pt solid currentColor; padding: 0 .2em; }
 .fr-d { padding: 0 .2em; }
 .fr-w { margin-right: .15em; }
+.pf .blank { height: 1.8em; }
 
-/* Clocks and equations (week 3 generators) */
-.pclk { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
-.clk { width: 100%; max-width: 120px; height: auto; display: block; }
-.clk-ans { display: flex; align-items: flex-end; gap: .2em; white-space: nowrap; }
+/* Clocks and equations */
+.pclk { display: flex; flex-direction: column; align-items: center; gap: .4em; width: 6.2em; }
+.clk { width: 6.2em; height: 6.2em; display: block; }
+.clk-ans { display: flex; align-items: flex-end; gap: .2em; white-space: nowrap; line-height: 1.6; }
 .eq-gap { display: inline-block; width: 1.2em; }
 .op { padding: 0 .1em; }
-.cmp-box { display: inline-block; width: 1.6em; height: 1.6em; border: 1.5px solid #111; border-radius: 4px; margin: 0 .3em; }
+.cmp-box { display: inline-block; width: 1.6em; height: 1.6em; border: 1pt solid #111; border-radius: 3pt; margin: 0 .3em; }
 .cmp { display: inline-block; min-width: 1.6em; text-align: center; margin: 0 .3em; }
 
-/* Long division */
-.pld { display: inline-flex; flex-direction: column; align-items: flex-end; font-family: var(--mono); line-height: 1.4; padding-bottom: 3.5em; }
+/* Written working: faint ruled lines (equations, word problems); real borders so they print
+ * even when the browser leaves out background graphics. */
+.work { display: flex; flex-direction: column; margin-top: .2em; max-width: 16em; }
+.work i { display: block; height: 1.6em; box-sizing: border-box; border-bottom: .6pt solid #aaa; }
+.fam-E .work { max-width: none; }
+
+/* Word problems */
+.pwp { display: flex; flex-direction: column; white-space: normal; line-height: 1.45; }
+.pwp-text { margin: 0; max-width: 70ch; }
+.pwp-ans { order: 2; margin-top: .4em; white-space: nowrap; }
+.pb > .pwp { display: contents; } /* text, then working lines, then the answer line */
+.pb > .work { order: 1; }
+
+/* Long division: the layout gives each problem room for its subtraction steps */
+.pld { display: inline-flex; flex-direction: column; align-items: flex-end; align-self: flex-start; line-height: 1.4; }
 .pld-q { min-height: 1.4em; padding-right: .2em; color: #0b6b4f; font-weight: 700; }
 .pld-row { display: flex; }
 .pld-dv { padding-right: .35em; }
-.pld-dd { border-top: 2px solid #111; border-left: 2px solid #111; border-top-left-radius: 10px 70%; padding: 0 .3em 0 .45em; }
+.pld-dd { border-top: 1.5pt solid #111; border-left: 1.5pt solid #111; border-top-left-radius: 10px 70%; padding: 0 .3em 0 .45em; }
+.sheet:not(.pg) .pld { padding-bottom: 3.5em; }
+.sheet:not(.pg) .sh-foot { margin-top: 18px; }
 
+/* Paged sheets (generator pages): each .sheet.pg is one sheet of paper, at its real size.
+ * On narrow screens app.js scales the page down with `zoom`. */
+.sheet.pg { box-sizing: border-box; width: var(--pw); max-width: none; height: var(--ph); padding: 12mm 14mm 10mm; display: flex; flex-direction: column; border-radius: 2px; }
+.sheet.pg .sh-grid { flex: 1 1 0; min-height: 0; grid-template-rows: repeat(var(--rows), minmax(0, 1fr)); row-gap: 0; }
+.sheet.pg .sh-foot { margin-top: 0; }
+.sheet.pg .pr { min-height: 0; }
 @media screen and (max-width: 640px) {
-  .sheet { padding: 18px 14px; }
-  .sh-grid { grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr)); gap: 18px 10px; }
-  .pr { font-size: 1.05rem; }
-  .sh-fields i { width: 110px; }
+  .sheet:not(.pg) { padding: 18px 14px; }
+  .sheet:not(.pg) .sh-grid { grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr)); gap: 18px 10px; font-size: 1.05rem; }
 }
 
 /* ---------- Print: only the worksheet(s) ---------- */
+@page { margin: 0; }
 @media print {
   :root { color-scheme: light; }
-  body { background: #fff; color: #000; font-size: 12pt; padding: 0 !important; }
+  html, body { background: #fff; color: #000; padding: 0 !important; margin: 0; }
   .site-head, .site-foot, .crumbs, .ws-controls, .ws-intro, .page-head, .preview-bar, .content, .related, .ad, .no-print, .skip { display: none !important; }
   main { padding: 0; }
   .wrap { max-width: none; padding: 0; }
   .ws-layout { display: block; }
   .workspace, .more { margin: 0; padding: 0; }
   .desk { padding: 0; border: 0; border-radius: 0; background: none; }
-  .sheet { box-shadow: none !important; border: 0; border-radius: 0; padding: 0; margin: 0; max-width: none; animation: none !important; transform: none !important; }
-  .sheet + .sheet { break-before: page; }
+  .sheet { box-shadow: none !important; border: 0; border-radius: 0; margin: 0; animation: none !important; transform: none !important; zoom: 1 !important; }
+  .sheet.pg { height: calc(var(--ph) - .4mm); break-after: page; break-inside: avoid; }
+  .sheet.pg:last-child { break-after: auto; }
   .sheet-key .ans, .sheet-key .pv-ans, .pld-q { color: #000; }
-  .sh-grid { gap: 26px 14px; }
-  .sheet:has(.pr-h) .sh-grid { gap: 22px 14px; }
-  .pr { font-size: 13.5pt; }
-  .sheet-lg .pr { font-size: 17pt; }
   a { color: #000; text-decoration: none; }
 }

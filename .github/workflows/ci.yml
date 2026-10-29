@@ -14,3 +14,15 @@ jobs:
       - run: node scripts/test-engine.js
       - run: node build.js
       - run: node scripts/check-site.js
+  print:
+    # Prints every worksheet (all counts, A4 and Letter, Classic and Large print, with answer key)
+    # in Chromium and checks nothing is cut, overlapping, missing or out of sync.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm i --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+      - run: node build.js
+      - run: node scripts/test-print.js

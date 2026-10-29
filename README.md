@@ -18,6 +18,8 @@ Prérequis : Node.js 18 ou plus récent (gratuit, https://nodejs.org).
 node build.js                 # génère le site dans dist/
 node scripts/test-engine.js   # vérifie 1,3 million de problèmes (réponses et règles)
 node scripts/check-site.js    # vérifie liens internes, titres, descriptions, sitemap
+node scripts/test-print.js    # (après un build) imprime toutes les fiches en PDF et vérifie la mise en page ; nécessite Playwright
+node scripts/make-print-samples.js   # (après un build) PDF des fiches témoins (une par famille) dans print-samples/
 npm run serve                 # build + aperçu local sur http://localhost:8080 (nécessite Python 3)
 SITE_URL=https://votre-site.pages.dev node scripts/check-live.js   # contrôle du site en ligne
 node scripts/make-og.js       # (après un build) régénère les images de partage dans static/og/ ; nécessite Playwright
@@ -31,7 +33,8 @@ build.js                Générateur du site (pages, sitemap, robots.txt, _heade
 src/catalog.js          Catalogue des fiches : 1 entrée = 1 page (titre, description, textes, paramètres)
 src/explain.js          Exemples résolus pas à pas (un par fiche), vérifiés par les tests
 static/og/              Images de partage 1200x630 (réseaux sociaux, Pinterest), copiées telles quelles dans dist/
-src/engine.js           Moteur : générateurs de problèmes + rendu HTML (partagé navigateur / build / tests)
+src/engine.js           Moteur : générateurs de problèmes + rendu HTML d'un exercice (partagé navigateur / build / tests)
+src/layout.js           Mise en page imprimable : familles A à F, pagination A4 / Letter, corrigé, styles Classic / Large print
 src/app.js              Interface : options, nouvelles fiches, impression, copie du lien, recherche
 src/styles.css          Styles écran + impression, mode sombre
 scripts/                Tests du moteur, contrôle du site construit, contrôle du site en ligne
@@ -45,7 +48,8 @@ docs/                   Tutoriel de mise en ligne, procédure AdSense et obligat
 1. Si un générateur existant convient (par ex. `add`, `sub`, `longDiv`), ajoutez simplement une entrée dans `src/catalog.js` avec un `slug` unique, un titre, une description, des paragraphes d'introduction **originaux** et les paramètres.
 2. Sinon, ajoutez une fonction `G.monGenerateur = function (rng, p) { ... }` dans `src/engine.js` qui renvoie un problème (`kind: 'h'` pour une ligne, `'v'` pour une opération posée, etc.), puis une vérification dans `scripts/test-engine.js`.
 3. Ajoutez un exemple résolu pour un nouveau générateur dans `src/explain.js`.
-4. Lancez `node scripts/test-engine.js && node build.js && node scripts/make-og.js && node scripts/check-site.js`, puis poussez sur GitHub : Cloudflare reconstruit et publie tout seul, sitemap compris.
+4. La mise en page est automatique : `src/layout.js` choisit la famille (A grille de calcul, B fractions et nombres, C équations, D figures et mesures, E problèmes rédigés, F opérations posées avec espace de travail) d'après le format des exercices. Pour la forcer, ajoutez `layout: 'C'` (par exemple) à l'entrée du catalogue.
+5. Lancez `node scripts/test-engine.js && node build.js && node scripts/make-og.js && node scripts/check-site.js`, puis poussez sur GitHub : Cloudflare reconstruit et publie tout seul, sitemap compris.
 
 ## Variables d'environnement (Cloudflare Pages > Settings > Variables)
 
