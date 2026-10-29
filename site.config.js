@@ -54,7 +54,7 @@ module.exports = {
 
   // Optional Google Search Console HTML-tag verification token (content="..." value).
   // Optional Pinterest "claim website" token (the content="..." value of the p:domain_verify tag).
-  pinterestVerification: process.env.PINTEREST_VERIFICATION || '',
+  pinterestVerification: process.env.PINTEREST_VERIFICATION || '97ae1f2701bd0ae1032f0eb6615d95d7',
 
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || 'deIIPbG75CvFmDynGaFyyoXJi-uRz0MJ2rIRozS6Trw'
 };
