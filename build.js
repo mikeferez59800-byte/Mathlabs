@@ -616,8 +616,8 @@ function main() {
   write('/sitemap.xml', sitemap(entries));
   write('/robots.txt', `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /multiplication-championship/admin/\n\nSitemap: ${abs('/sitemap.xml')}\n`);
   write('/_headers', HEADERS);
-  // Only the championship API runs as a Pages Function; every page stays a free static request.
-  write('/_routes.json', JSON.stringify({ version: 1, include: ['/api/*'], exclude: [] }, null, 2) + '\n');
+  // Only the championship API and the Pinterest claim file run as Pages Functions; every page stays a free static request.
+  write('/_routes.json', JSON.stringify({ version: 1, include: ['/api/*', '/pinterest-97ae1.html'], exclude: [] }, null, 2) + '\n');
   if (fs.existsSync(STATIC)) fs.cpSync(STATIC, DIST, { recursive: true });
   if (/^ca-pub-\d{10,20}$/.test(config.ads.client)) {
     write('/ads.txt', `google.com, ${config.ads.client.replace('ca-', '')}, DIRECT, f08c47fec0942fa0\n`);
