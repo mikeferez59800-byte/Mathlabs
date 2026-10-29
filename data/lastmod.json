@@ -40,319 +40,319 @@
   "lastmod": "2026-10-29"
  },
  "/addition/addition-within-10/": {
-  "hash": "22e1eefd40",
+  "hash": "9bc1ce2ae2",
   "lastmod": "2026-10-29"
  },
  "/addition/addition-within-20/": {
-  "hash": "ae0d4ed960",
+  "hash": "460184a837",
   "lastmod": "2026-10-29"
  },
  "/addition/adding-three-numbers/": {
-  "hash": "a97c287a49",
+  "hash": "e4fe87042e",
   "lastmod": "2026-10-29"
  },
  "/addition/two-digit-addition-no-regrouping/": {
-  "hash": "e162cac84b",
+  "hash": "136e25e554",
   "lastmod": "2026-10-29"
  },
  "/addition/two-digit-addition-with-regrouping/": {
-  "hash": "06fa68b1fa",
+  "hash": "842e4ce1f6",
   "lastmod": "2026-10-29"
  },
  "/addition/three-digit-addition/": {
-  "hash": "1aab7e9b80",
+  "hash": "6dd4900187",
   "lastmod": "2026-10-29"
  },
  "/addition/four-digit-addition/": {
-  "hash": "e7f8a86b77",
+  "hash": "98b21198fb",
   "lastmod": "2026-10-29"
  },
  "/subtraction/subtraction-within-10/": {
-  "hash": "3217ff3de8",
+  "hash": "03849ac8b6",
   "lastmod": "2026-10-29"
  },
  "/subtraction/subtraction-within-20/": {
-  "hash": "c99c81f625",
+  "hash": "1248cbef53",
   "lastmod": "2026-10-29"
  },
  "/subtraction/two-digit-subtraction-no-borrowing/": {
-  "hash": "294accada1",
+  "hash": "ee7826af07",
   "lastmod": "2026-10-29"
  },
  "/subtraction/two-digit-subtraction-with-borrowing/": {
-  "hash": "2ffde5c824",
+  "hash": "0fb30d5614",
   "lastmod": "2026-10-29"
  },
  "/subtraction/three-digit-subtraction/": {
-  "hash": "93233a6baf",
+  "hash": "b7f5d9f8b5",
   "lastmod": "2026-10-29"
  },
  "/subtraction/four-digit-subtraction/": {
-  "hash": "e8612322fd",
+  "hash": "13b43a8717",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-2/": {
-  "hash": "ca104ca5a5",
+  "hash": "3d79926dd6",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-3/": {
-  "hash": "8099ec2df4",
+  "hash": "029856b7df",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-4/": {
-  "hash": "c705638d29",
+  "hash": "c20be0e911",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-5/": {
-  "hash": "c3dc5e8ac3",
+  "hash": "0540fadeec",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-6/": {
-  "hash": "3357dc8ddc",
+  "hash": "10e0883194",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-7/": {
-  "hash": "16bdd64744",
+  "hash": "3d577a9d1d",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-8/": {
-  "hash": "bfd861c637",
+  "hash": "ec1a0a27ed",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-9/": {
-  "hash": "9cee9bfcff",
+  "hash": "0e87fc1730",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-10/": {
-  "hash": "2d7819d725",
+  "hash": "07c2ec51af",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-11/": {
-  "hash": "8c397c9c37",
+  "hash": "a2b02e5f6b",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-table-of-12/": {
-  "hash": "32e165e694",
+  "hash": "e465c17662",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-facts-0-10/": {
-  "hash": "1315e15288",
+  "hash": "5c50e38c13",
   "lastmod": "2026-10-29"
  },
  "/multiplication/multiplication-facts-0-12/": {
-  "hash": "2d79d642ce",
+  "hash": "a221f22e01",
   "lastmod": "2026-10-29"
  },
  "/multiplication/two-digit-by-one-digit-multiplication/": {
-  "hash": "97732e07f3",
+  "hash": "b58a8684de",
   "lastmod": "2026-10-29"
  },
  "/multiplication/three-digit-by-one-digit-multiplication/": {
-  "hash": "d85c4939b3",
+  "hash": "85f7745ed7",
   "lastmod": "2026-10-29"
  },
  "/multiplication/two-digit-by-two-digit-multiplication/": {
-  "hash": "a16489aa58",
+  "hash": "5c39125fcc",
   "lastmod": "2026-10-29"
  },
  "/multiplication/three-digit-by-two-digit-multiplication/": {
-  "hash": "c24c11caef",
+  "hash": "b25eaaf639",
   "lastmod": "2026-10-29"
  },
  "/division/division-facts-within-100/": {
-  "hash": "b79fe4b253",
+  "hash": "2025ecb591",
   "lastmod": "2026-10-29"
  },
  "/division/division-facts-within-144/": {
-  "hash": "709d040532",
+  "hash": "0a498d8c24",
   "lastmod": "2026-10-29"
  },
  "/division/long-division-no-remainder/": {
-  "hash": "7f83b10d13",
+  "hash": "dafb14b883",
   "lastmod": "2026-10-29"
  },
  "/division/long-division-with-remainders/": {
-  "hash": "e05bd24d40",
+  "hash": "75674bbecf",
   "lastmod": "2026-10-29"
  },
  "/division/long-division-4-digit-by-1-digit/": {
-  "hash": "0196a179a6",
+  "hash": "ead8853e2f",
   "lastmod": "2026-10-29"
  },
  "/division/long-division-two-digit-divisor/": {
-  "hash": "66fbf0cc36",
+  "hash": "59dbe36f52",
   "lastmod": "2026-10-29"
  },
  "/fractions/simplifying-fractions/": {
-  "hash": "c82e1a37b7",
+  "hash": "3a08b33e92",
   "lastmod": "2026-10-29"
  },
  "/fractions/comparing-fractions/": {
-  "hash": "92a6774275",
+  "hash": "e2afc3ce08",
   "lastmod": "2026-10-29"
  },
  "/fractions/adding-fractions-like-denominators/": {
-  "hash": "36acd108c0",
+  "hash": "e648c1eb5f",
   "lastmod": "2026-10-29"
  },
  "/fractions/subtracting-fractions-like-denominators/": {
-  "hash": "5d9dcdb86c",
+  "hash": "4b85b76dbd",
   "lastmod": "2026-10-29"
  },
  "/fractions/adding-fractions-unlike-denominators/": {
-  "hash": "339139a894",
+  "hash": "8c0ee4bed9",
   "lastmod": "2026-10-29"
  },
  "/fractions/subtracting-fractions-unlike-denominators/": {
-  "hash": "4d3d16f45c",
+  "hash": "8a2e57ae3a",
   "lastmod": "2026-10-29"
  },
  "/fractions/multiplying-fractions/": {
-  "hash": "1d348bdde2",
+  "hash": "563807a57c",
   "lastmod": "2026-10-29"
  },
  "/fractions/dividing-fractions/": {
-  "hash": "d573cfa141",
+  "hash": "d2bb6852b8",
   "lastmod": "2026-10-29"
  },
  "/decimals/adding-decimals/": {
-  "hash": "e64b57c6ba",
+  "hash": "7371e064cc",
   "lastmod": "2026-10-29"
  },
  "/decimals/subtracting-decimals/": {
-  "hash": "8dfe539698",
+  "hash": "1d2085b269",
   "lastmod": "2026-10-29"
  },
  "/decimals/multiplying-decimals/": {
-  "hash": "62485ce957",
+  "hash": "ce1a3849c4",
   "lastmod": "2026-10-29"
  },
  "/decimals/multiplying-decimals-by-whole-numbers/": {
-  "hash": "35b7a6f160",
+  "hash": "e05ffc0ea3",
   "lastmod": "2026-10-29"
  },
  "/number-sense/missing-addends/": {
-  "hash": "72d067dc33",
+  "hash": "0878b5b433",
   "lastmod": "2026-10-29"
  },
  "/number-sense/rounding-to-nearest-10/": {
-  "hash": "02644dbfc8",
+  "hash": "ffe24ef988",
   "lastmod": "2026-10-29"
  },
  "/number-sense/rounding-to-nearest-100/": {
-  "hash": "b551f655f0",
+  "hash": "a1b9c79614",
   "lastmod": "2026-10-29"
  },
  "/number-sense/rounding-to-nearest-1000/": {
-  "hash": "9fa8810926",
+  "hash": "51dc2fc8ad",
   "lastmod": "2026-10-29"
  },
  "/number-sense/comparing-numbers/": {
-  "hash": "d2374f01f0",
+  "hash": "50f459631e",
   "lastmod": "2026-10-29"
  },
  "/number-sense/expanded-form/": {
-  "hash": "d0846cbb8d",
+  "hash": "bb219ba7a2",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/adding-and-subtracting-integers/": {
-  "hash": "328aeb2f02",
+  "hash": "a32213c7f8",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/multiplying-integers/": {
-  "hash": "d0c8945324",
+  "hash": "faa2f47bbc",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/dividing-integers/": {
-  "hash": "3167c5bedb",
+  "hash": "7a35247bb8",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/order-of-operations/": {
-  "hash": "d477af6760",
+  "hash": "ca15395f51",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/order-of-operations-with-parentheses/": {
-  "hash": "0258b93b44",
+  "hash": "2fac55b53a",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/exponents/": {
-  "hash": "91e13393ff",
+  "hash": "8c9d604b3c",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/percent-of-a-number/": {
-  "hash": "0bed898070",
+  "hash": "7664328eb1",
   "lastmod": "2026-10-29"
  },
  "/measurement/telling-time-hour/": {
-  "hash": "ee1176e26e",
+  "hash": "199769b2a7",
   "lastmod": "2026-10-29"
  },
  "/measurement/telling-time-half-hour/": {
-  "hash": "0aeaa9d60a",
+  "hash": "19bdac46db",
   "lastmod": "2026-10-29"
  },
  "/measurement/telling-time-quarter-hour/": {
-  "hash": "2569dec92a",
+  "hash": "1cb8313236",
   "lastmod": "2026-10-29"
  },
  "/measurement/telling-time-five-minutes/": {
-  "hash": "a07f045f36",
+  "hash": "e4865f184b",
   "lastmod": "2026-10-29"
  },
  "/measurement/adding-money/": {
-  "hash": "ff4204f30a",
+  "hash": "37a6b29d95",
   "lastmod": "2026-10-29"
  },
  "/measurement/subtracting-money/": {
-  "hash": "7dd0917f0b",
+  "hash": "cf4c135469",
   "lastmod": "2026-10-29"
  },
  "/measurement/metric-conversions/": {
-  "hash": "e62769ac23",
+  "hash": "f6bcf101a1",
   "lastmod": "2026-10-29"
  },
  "/measurement/customary-conversions/": {
-  "hash": "0f504799bc",
+  "hash": "c1f84f8ead",
   "lastmod": "2026-10-29"
  },
  "/decimals/multiplying-by-10-100-1000/": {
-  "hash": "b3ed834d1e",
+  "hash": "7837f65849",
   "lastmod": "2026-10-29"
  },
  "/decimals/dividing-by-10-100-1000/": {
-  "hash": "a57e6bb522",
+  "hash": "1bc8376820",
   "lastmod": "2026-10-29"
  },
  "/decimals/dividing-decimals-by-whole-numbers/": {
-  "hash": "81715b0e55",
+  "hash": "2a1bbfd8c0",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/one-step-equations-addition-subtraction/": {
-  "hash": "adbc295526",
+  "hash": "ab0e20e725",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/one-step-equations-multiplication-division/": {
-  "hash": "1a60ddc7cd",
+  "hash": "9044bba010",
   "lastmod": "2026-10-29"
  },
  "/pre-algebra/two-step-equations/": {
-  "hash": "18c42a7e6a",
+  "hash": "807d5134bb",
   "lastmod": "2026-10-29"
  },
  "/fractions/mixed-numbers-to-improper-fractions/": {
-  "hash": "68b24551a6",
+  "hash": "e20fd9e5c2",
   "lastmod": "2026-10-29"
  },
  "/fractions/improper-fractions-to-mixed-numbers/": {
-  "hash": "3a5368c092",
+  "hash": "b1f636efbc",
   "lastmod": "2026-10-29"
  },
  "/number-sense/greatest-common-factor/": {
-  "hash": "bb131d53e8",
+  "hash": "106478f8a7",
   "lastmod": "2026-10-29"
  },
  "/number-sense/least-common-multiple/": {
-  "hash": "fdc077f1ac",
+  "hash": "bb8fd73c06",
   "lastmod": "2026-10-29"
  },
  "/multiplication-championship/": {

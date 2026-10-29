@@ -59,7 +59,7 @@ function buildAssets() {
   const fontName = `/assets/inter.${crypto.createHash('sha256').update(font).digest('hex').slice(0, 10)}.woff2`;
   write(fontName, font);
   const css = fs.readFileSync(path.join(ROOT, 'src/styles.css'), 'utf8').replace('__INTER_WOFF2__', fontName);
-  const js = ['src/engine.js', 'src/layout.js', 'src/app.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const js = ['src/engine.js', 'src/layout.js', 'src/app.js', 'src/practice.js', 'src/practice-ui.js'].map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
   const ui = fs.readFileSync(path.join(ROOT, 'src/ui.js'), 'utf8');
   const cssName = `/assets/styles.${hash(css)}.css`;
   const jsName = `/assets/app.${hash(js)}.js`;
@@ -67,8 +67,12 @@ function buildAssets() {
   write(cssName, css);
   write(jsName, js);
   write(uiName, ui);
+  // Step-by-step explanations for online practice: loaded on demand, only when a student asks "Show me how".
+  const explainJs = `(function () { var module = { exports: {} };\n${fs.readFileSync(path.join(ROOT, 'src/explain.js'), 'utf8')}\nself.MSLExplain = module.exports.explain; })();\n`;
+  const explainName = `/assets/explain.${hash(explainJs)}.js`;
+  write(explainName, explainJs);
   write('/favicon.svg', FAVICON);
-  return { css: cssName, js: jsName, ui: uiName, font: fontName, ...CHAMP.buildAssets({ ROOT, write, hash }) };
+  return { css: cssName, js: jsName, ui: uiName, explain: explainName, font: fontName, ...CHAMP.buildAssets({ ROOT, write, hash }) };
 }
 
 const LOGO_MARK = (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>` +
@@ -399,6 +403,7 @@ function worksheetPage(assets, t) {
 <h1>${esc(t.h1.charAt(0).toUpperCase() + t.h1.slice(1))}</h1>
 <ul class="chips meta" aria-label="About this worksheet"><li>${ICON.grad}Level: ${esc(t.grade)}</li><li>Free</li><li>Printable</li><li>Answer key included</li></ul>
 <p class="lead">${esc(t.intro[0])}</p>
+<p class="head-actions"><a class="btn btn-ghost btn-sm" href="#practice">${icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>')}Practice online</a></p>
 </div></section>
 <div class="workspace"><div class="wrap ws-layout">
 <aside class="panel ws-controls" aria-labelledby="opts-h">
@@ -437,6 +442,7 @@ ${pinLink(t)}
 </section>
 </div></div>
 <div class="wrap more">
+${practiceCard(t)}
 ${t.cat === 'multiplication' ? CHAMP.multBanner('compact') : ''}
 ${adSlot('top')}
 <section class="content">
@@ -454,7 +460,7 @@ ${related.length ? `<section class="related"><h2>Related worksheets</h2><ul>${re
 ${siblings.length ? `<section class="related"><h2>More ${esc(c.name.toLowerCase())} worksheets</h2><ul>${siblings.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${adSlot('bottom')}
 </div>
-<script type="application/json" id="ws-config">${JSON.stringify({ type: clientType, defaultSeed: seed, siteName: config.name, siteHost: siteHost() }).replace(/</g, '\\u003c')}</script>`;
+<script type="application/json" id="ws-config">${JSON.stringify({ type: clientType, defaultSeed: seed, siteName: config.name, siteHost: siteHost(), explainJs: assets.explain }).replace(/</g, '\\u003c')}</script>`;
 
   const ld = [bc.ld, {
     '@context': 'https://schema.org', '@type': 'LearningResource', name: clientType.sheetTitle, description: t.desc,
@@ -462,6 +468,22 @@ ${adSlot('bottom')}
     isAccessibleForFree: true, about: c.name, publisher: { '@type': 'Organization', name: config.name, url: abs('/') }
   }];
   return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar', ...(t.cat === 'multiplication' ? { css: [assets.champCss] } : {}) });
+}
+
+// Online practice entry point (the practice itself runs in a dialog, see src/practice-ui.js).
+function practiceCard(t) {
+  const level = (v, label, sub) => `<label class="seg-opt"><input type="radio" name="level" value="${v}"${v === 'medium' ? ' checked' : ''}><span><strong>${label}</strong><small>${sub}</small></span></label>`;
+  return `<section class="practice-card no-print" id="practice" aria-labelledby="pr-h">
+<div class="pr-card-text"><p class="kicker">Answer on screen</p><h2 id="pr-h">Practice online</h2>
+<p>Answer the problems right here, one at a time. Each answer is checked instantly, with a step-by-step explanation after a mistake and a score at the end. No account needed, and nothing is sent to our servers.</p>
+<p class="pr-best" id="pr-best"></p></div>
+<form id="pr-start" class="pr-start">
+<fieldset class="seg"><legend>Level</legend>${level('easy', 'Easy', 'Smaller numbers')}${level('medium', 'Medium', 'Like the worksheet')}${level('hard', 'Hard', 'Bigger challenge')}</fieldset>
+<div class="pr-start-row"><div class="field"><label for="pr-n">Questions</label><select id="pr-n" name="n"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></div>
+<button type="submit" class="btn btn-primary btn-lg">Start practice</button></div>
+<noscript><p class="notice">Online practice needs JavaScript. You can still print the worksheet above.</p></noscript>
+</form>
+</section>`;
 }
 
 // One fully explained problem per page. Among a few candidates, take the one with the most steps

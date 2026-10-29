@@ -5,7 +5,7 @@
   "description": "Free printable math worksheet generators. Static site, no dependencies.",
   "scripts": {
     "build": "node build.js",
-    "test": "node scripts/test-engine.js && node build.js && node scripts/check-site.js",
+    "test": "node scripts/test-engine.js && node scripts/test-practice.js && node build.js && node scripts/check-site.js",
     "test:championship": "node scripts/test-championship.mjs",
     "check:live": "node scripts/check-live.js",
     "serve": "node build.js && cd dist && python3 -m http.server 8080"

@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/test-engine.js
+      - run: node scripts/test-practice.js
       - run: node build.js
       - run: node scripts/check-site.js
   championship:
