@@ -18,6 +18,7 @@ Prérequis : Node.js 18 ou plus récent (gratuit, https://nodejs.org).
 node build.js                 # génère le site dans dist/
 node scripts/test-engine.js   # vérifie 1,3 million de problèmes (réponses et règles)
 node scripts/test-practice.js # entraînement en ligne : niveaux, correction des réponses tapées, sur les 79 fiches
+node scripts/test-qr.js       # QR codes des devoirs : encode puis relit 50 textes (nécessite jsqr)
 node scripts/check-site.js    # vérifie liens internes, titres, descriptions, sitemap
 node scripts/test-print.js    # (après un build) imprime toutes les fiches en PDF et vérifie la mise en page ; nécessite Playwright
 node scripts/make-print-samples.js   # (après un build) PDF des fiches témoins (une par famille) dans print-samples/
@@ -40,6 +41,8 @@ src/layout.js           Mise en page imprimable : familles A à F, pagination A4
 src/app.js              Interface : options, nouvelles fiches, impression, copie du lien, recherche
 src/practice.js         Entraînement en ligne : niveaux Easy / Medium / Hard et correction des réponses (partagé navigateur / tests)
 src/practice-ui.js      Fenêtre d'entraînement : une question à la fois, score, explication pas à pas, options d'affichage
+src/assign.js           Devoirs de classe (/assign/) : lien + QR code pour l'enseignant, code de résultat vérifiable, sans compte ni serveur
+src/qr.js               Générateur de QR code sans dépendance (versions 1 à 10, niveau M)
 src/styles.css          Styles écran + impression, mode sombre
 scripts/                Tests du moteur, contrôle du site construit, contrôle du site en ligne
 .github/workflows/      CI (tests à chaque push) et contrôle hebdomadaire du site en ligne

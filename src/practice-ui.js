@@ -1,58 +1,33 @@
 /* MathSheetLab online practice: one question at a time, instant feedback, score.
  * Problems and checking come from engine.js and practice.js; nothing leaves the browser
- * (best scores and display preferences are kept in localStorage on this device only). */
+ * (best scores and display preferences are kept in localStorage on this device only).
+ * MSL.practiceRunner.open() is shared by worksheet pages and class assignments (assign.js). */
 (function () {
   'use strict';
 
-  var cfgEl = document.getElementById('ws-config');
-  var start = document.getElementById('pr-start');
-  if (!cfgEl || !start || !window.MSL || !window.MSL.practice) return;
-  var cfg = JSON.parse(cfgEl.textContent);
-  var type = cfg.type;
-  var P = window.MSL.practice;
+  if (!window.MSL || !window.MSL.practice) return;
+  var MSL = window.MSL, P = MSL.practice;
   var LEVEL_NAMES = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
   var STORE = 'msl-practice-v1', PREFS = 'msl-display-v1';
 
   function load(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { return {}; } }
   function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* private mode */ } }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function shortTitle(h1) { return cap(h1.replace(/ worksheets?$/i, '')); }
+  function clock(secs) { return Math.floor(secs / 60) + ':' + ('0' + secs % 60).slice(-2); }
 
-  // ---------- Start form ----------
-  var bestEl = document.getElementById('pr-best');
-  showBest();
-  start.addEventListener('submit', function (e) {
-    e.preventDefault();
-    open(start.level.value, Number(start.n.value) || 10, window.MSL.randomSeed());
-  });
-  // Direct link: ?practice=easy|medium|hard[&q=10][&ps=123456] opens the practice straight away.
-  var qs = new URLSearchParams(location.search);
-  if (qs.get('practice')) {
-    var lv = P.LEVELS.indexOf(qs.get('practice')) === -1 ? 'medium' : qs.get('practice');
-    var qn = [5, 10, 20].indexOf(Number(qs.get('q'))) === -1 ? 10 : Number(qs.get('q'));
-    var ps = Number(qs.get('ps'));
-    start.level.value = lv;
-    start.n.value = String(qn);
-    open(lv, qn, ps >= 100000 && ps <= 999999 ? ps : window.MSL.randomSeed());
-  }
-
-  function showBest() {
-    if (!bestEl) return;
-    var mine = load(STORE)[type.slug] || {};
-    var parts = P.LEVELS.filter(function (l) { return mine[l]; }).map(function (l) {
-      return LEVEL_NAMES[l] + ' ' + mine[l].pct + '%';
-    });
-    bestEl.textContent = parts.length ? 'Your best on this device: ' + parts.join(' · ') : '';
-  }
-
-  // ---------- Dialog ----------
-  var dlg, round;
+  // ---------- Runner ----------
+  // opts: { title, meta (e.g. level name), items: [{ type, p }], explainJs,
+  //         onFinish(result) -> { html, actions: [{ label, primary, run }] }, onClose }
+  var dlg, round, opts;
   function build() {
     dlg = document.createElement('dialog');
     dlg.className = 'pr-dlg';
     dlg.setAttribute('aria-labelledby', 'pr-title');
     dlg.innerHTML =
       '<div class="pr-head">' +
-        '<div class="pr-head-main"><p class="pr-kicker" id="pr-meta"></p><h2 id="pr-title">' + esc(cap(type.h1.replace(/ worksheets?$/i, ''))) + '</h2></div>' +
+        '<div class="pr-head-main"><p class="pr-kicker" id="pr-meta"></p><h2 id="pr-title"></h2></div>' +
         '<details class="pr-display"><summary>Display</summary><div class="pr-display-menu">' +
           '<label class="check"><input type="checkbox" name="lg"> Larger text</label>' +
           '<label class="check"><input type="checkbox" name="hc"> High contrast</label>' +
@@ -78,10 +53,11 @@
     });
   }
 
-  function open(level, count, seed) {
+  function open(o) {
     if (!dlg) build();
-    round = { level: level, count: count, seed: seed, i: 0, right: 0, missed: [], tries: 0,
-      list: P.questions(window.MSL, type, seed, count, level), started: Date.now() };
+    opts = o;
+    round = { i: 0, right: 0, missed: [], tries: 0, count: o.items.length, started: Date.now() };
+    dlg.querySelector('#pr-title').textContent = o.title;
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
     document.documentElement.classList.add('pr-open');
     ask();
@@ -89,35 +65,36 @@
   function close() {
     if (typeof dlg.close === 'function' && dlg.open) dlg.close(); else dlg.removeAttribute('open');
     document.documentElement.classList.remove('pr-open');
-    showBest();
-    var btn = start.querySelector('button[type="submit"]');
-    if (btn) btn.focus();
+    if (opts && opts.onClose) opts.onClose();
   }
 
-  function setMeta() {
-    dlg.querySelector('#pr-meta').textContent = LEVEL_NAMES[round.level] + ' · Question ' + Math.min(round.i + 1, round.count) + ' of ' + round.count;
-    dlg.querySelector('.pr-bar i').style.width = (100 * round.i / round.count) + '%';
+  function setMeta(done) {
+    dlg.querySelector('#pr-meta').textContent = (opts.meta ? opts.meta + ' · ' : '') +
+      (done ? 'Finished' : 'Question ' + (round.i + 1) + ' of ' + round.count);
+    dlg.querySelector('.pr-bar i').style.width = (100 * (done ? 1 : round.i / round.count)) + '%';
   }
   function say(text) { var live = dlg.querySelector('#pr-live'); live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30); }
 
   // ---------- One question ----------
   function ask() {
-    var p = round.list[round.i];
+    var item = opts.items[round.i], p = item.p;
     round.tries = 0;
-    setMeta();
+    setMeta(false);
     var kind = P.inputKind(p);
     var body = dlg.querySelector('#pr-body');
+    var showTopic = opts.items.some(function (x) { return x.type.slug !== item.type.slug; });
     body.innerHTML =
-      '<p class="pr-instruction">' + esc(type.instruction || '') + '</p>' +
-      '<div class="pr-problem" aria-hidden="true">' + window.MSL.renderProblem(p, false) + '</div>' +
+      (showTopic ? '<p class="pr-topic">' + esc(shortTitle(item.type.h1)) + '</p>' : '') +
+      '<p class="pr-instruction">' + esc(item.type.instruction || '') + '</p>' +
+      '<div class="pr-problem pr-q" aria-hidden="true">' + MSL.renderProblem(p, false) + '</div>' +
       '<p class="visually-hidden">' + esc(spoken(p)) + '</p>' +
       '<form class="pr-answer" novalidate>' + inputHtml(p, kind) + '</form>' +
       '<div class="pr-feedback" id="pr-feedback"></div>';
     var form = body.querySelector('form');
-    form.addEventListener('submit', function (e) { e.preventDefault(); submit(p, kind, form); });
+    form.addEventListener('submit', function (e) { e.preventDefault(); submit(item, kind, form); });
     if (kind === 'choice') {
       Array.prototype.forEach.call(form.querySelectorAll('[data-choice]'), function (b) {
-        b.addEventListener('click', function () { form.choice.value = b.getAttribute('data-choice'); submit(p, kind, form); });
+        b.addEventListener('click', function () { form.choice.value = b.getAttribute('data-choice'); submit(item, kind, form); });
       });
     }
     var first = form.querySelector('input:not([type="hidden"]), button');
@@ -151,7 +128,8 @@
       (hint ? '<p class="pr-hint" id="pr-hint">' + esc(hint) + '</p>' : '');
   }
 
-  function submit(p, kind, form) {
+  function submit(item, kind, form) {
+    var p = item.p;
     var input = kind === 'choice' ? form.choice.value : kind === 'clock' ? { h: form.h.value, m: form.m.value } : form.a.value;
     var empty = kind === 'clock' ? !input.h.trim() : !String(input).trim();
     var fb = dlg.querySelector('#pr-feedback');
@@ -171,11 +149,11 @@
     } else {
       round.missed.push(p);
       fb.innerHTML = '<p class="pr-msg pr-no">Not quite. The answer is:</p>' +
-        '<div class="pr-problem pr-solution">' + window.MSL.renderProblem(p, true) + '</div>' +
+        '<div class="pr-problem pr-solution">' + MSL.renderProblem(p, true) + '</div>' +
         '<details class="pr-how"><summary>Show me how</summary><ol class="pr-steps"><li>Loading…</li></ol></details>' + nextButton();
       say('Not quite. The answer is ' + P.expectedText(p) + '.');
       var how = fb.querySelector('.pr-how');
-      how.addEventListener('toggle', function () { if (how.open) explainInto(p, how.querySelector('.pr-steps')); });
+      how.addEventListener('toggle', function () { if (how.open) explainInto(item, how.querySelector('.pr-steps')); });
     }
     var next = fb.querySelector('.pr-next');
     next.addEventListener('click', function () {
@@ -190,59 +168,50 @@
 
   // Step-by-step explanation, loaded only when a student asks for it.
   var explainReady;
-  function explainInto(p, list) {
+  function explainInto(item, list) {
     if (!explainReady) {
       explainReady = new Promise(function (resolve, reject) {
         if (window.MSLExplain) return resolve();
         var s = document.createElement('script');
-        s.src = cfg.explainJs; s.onload = resolve; s.onerror = reject;
+        s.src = opts.explainJs; s.onload = resolve; s.onerror = reject;
         document.head.appendChild(s);
       });
     }
     explainReady.then(function () {
-      var ex = window.MSLExplain(type, p);
+      var ex = window.MSLExplain(item.type, item.p);
       list.innerHTML = ex.steps.map(function (st) { return '<li>' + esc(st) + '</li>'; }).join('');
     }).catch(function () {
       explainReady = null;
-      list.innerHTML = '<li>The explanation could not be loaded. See the worked example on this page.</li>';
+      list.innerHTML = '<li>The explanation could not be loaded. See the worked example on the worksheet page.</li>';
     });
   }
 
   // ---------- Score ----------
   function finish() {
-    var secs = Math.round((Date.now() - round.started) / 1000);
-    var pct = Math.round(100 * round.right / round.count);
-    var all = load(STORE), mine = all[type.slug] || {}, prev = mine[round.level];
-    var record = !prev || pct > prev.pct;
-    if (record) { mine[round.level] = { pct: pct, right: round.right, total: round.count, secs: secs }; all[type.slug] = mine; save(STORE, all); }
-    var msg = pct === 100 ? 'Perfect score!' : pct >= 80 ? 'Great work!' : pct >= 50 ? 'Good effort, keep practicing.' : 'Keep going: practice makes progress.';
-    var li = P.LEVELS.indexOf(round.level);
-    var nextLevel = pct >= 80 && li < 2 ? P.LEVELS[li + 1] : pct < 50 && li > 0 ? P.LEVELS[li - 1] : null;
-    round.i = round.count;
-    setMeta();
-    dlg.querySelector('#pr-meta').textContent = LEVEL_NAMES[round.level] + ' · Finished';
+    var result = { right: round.right, total: round.count, secs: Math.round((Date.now() - round.started) / 1000) };
+    result.pct = Math.round(100 * result.right / result.total);
+    var extra = opts.onFinish ? opts.onFinish(result) : { html: '', actions: [] };
+    var msg = result.pct === 100 ? 'Perfect score!' : result.pct >= 80 ? 'Great work!' : result.pct >= 50 ? 'Good effort, keep practicing.' : 'Keep going: practice makes progress.';
+    setMeta(true);
     var body = dlg.querySelector('#pr-body');
     body.innerHTML =
-      '<div class="pr-result"><p class="pr-score"><strong>' + round.right + '</strong> / ' + round.count + '</p>' +
+      '<div class="pr-result"><p class="pr-score"><strong>' + result.right + '</strong> / ' + result.total + '</p>' +
       '<p class="pr-result-msg">' + msg + '</p>' +
-      '<ul class="chips pr-stats"><li>' + pct + '% correct</li><li>Time ' + Math.floor(secs / 60) + ':' + ('0' + secs % 60).slice(-2) + '</li>' +
-      (record ? '<li>New best on this device</li>' : '<li>Best: ' + prev.pct + '%</li>') + '</ul></div>' +
+      '<ul class="chips pr-stats"><li>' + result.pct + '% correct</li><li>Time ' + clock(result.secs) + '</li>' + (extra.chips || '') + '</ul></div>' +
+      (extra.html || '') +
       (round.missed.length ? '<h3 class="pr-review-h">Review your mistakes</h3><ul class="pr-review">' + round.missed.map(function (p) {
-        return '<li class="pr-problem">' + window.MSL.renderProblem(p, true) + '</li>';
+        return '<li class="pr-problem">' + MSL.renderProblem(p, true) + '</li>';
       }).join('') + '</ul>' : '') +
-      '<div class="pr-end-actions">' +
-      (nextLevel ? '<button type="button" class="btn btn-primary" data-level="' + nextLevel + '">Try ' + LEVEL_NAMES[nextLevel] + ' level</button>' : '') +
-      '<button type="button" class="btn ' + (nextLevel ? 'btn-secondary' : 'btn-primary') + '" data-level="' + round.level + '">New questions</button>' +
-      '<button type="button" class="btn btn-secondary" data-close>Back to the worksheet</button></div>';
-    say('You scored ' + round.right + ' out of ' + round.count + '. ' + msg);
-    Array.prototype.forEach.call(body.querySelectorAll('[data-level]'), function (b) {
-      b.addEventListener('click', function () {
-        start.level.value = b.getAttribute('data-level');
-        open(b.getAttribute('data-level'), round.count, window.MSL.randomSeed());
-      });
+      '<div class="pr-end-actions">' + (extra.actions || []).map(function (a, i) {
+        return '<button type="button" class="btn ' + (a.primary ? 'btn-primary' : 'btn-secondary') + '" data-action="' + i + '">' + esc(a.label) + '</button>';
+      }).join('') + '</div>';
+    say('You scored ' + result.right + ' out of ' + result.total + '. ' + msg);
+    Array.prototype.forEach.call(body.querySelectorAll('[data-action]'), function (b) {
+      b.addEventListener('click', function () { extra.actions[+b.getAttribute('data-action')].run(); });
     });
-    body.querySelector('[data-close]').addEventListener('click', close);
-    body.querySelector('.pr-end-actions .btn').focus();
+    if (extra.ready) extra.ready(body);
+    var first = body.querySelector('.pr-end-actions .btn');
+    if (first) first.focus();
   }
 
   // ---------- Text for screen readers ----------
@@ -262,5 +231,60 @@
           .replace(/___/g, 'blank').replace(/\s+/g, ' ').trim();
     }
   }
-  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  MSL.practiceRunner = { open: open, close: close, shortTitle: shortTitle, clock: clock, LEVEL_NAMES: LEVEL_NAMES };
+
+  // ---------- Worksheet page ----------
+  var cfgEl = document.getElementById('ws-config');
+  var start = document.getElementById('pr-start');
+  if (!cfgEl || !start) return;
+  var cfg = JSON.parse(cfgEl.textContent);
+  var type = cfg.type;
+  var bestEl = document.getElementById('pr-best');
+  showBest();
+  start.addEventListener('submit', function (e) {
+    e.preventDefault();
+    practice(start.level.value, Number(start.n.value) || 10, MSL.randomSeed());
+  });
+  // Direct link: ?practice=easy|medium|hard[&q=10][&ps=123456] opens the practice straight away.
+  var qs = new URLSearchParams(location.search);
+  if (qs.get('practice')) {
+    var lv = P.LEVELS.indexOf(qs.get('practice')) === -1 ? 'medium' : qs.get('practice');
+    var qn = [5, 10, 20].indexOf(Number(qs.get('q'))) === -1 ? 10 : Number(qs.get('q'));
+    var ps = Number(qs.get('ps'));
+    start.level.value = lv;
+    start.n.value = String(qn);
+    practice(lv, qn, ps >= 100000 && ps <= 999999 ? ps : MSL.randomSeed());
+  }
+
+  function showBest() {
+    if (!bestEl) return;
+    var mine = load(STORE)[type.slug] || {};
+    var parts = P.LEVELS.filter(function (l) { return mine[l]; }).map(function (l) {
+      return LEVEL_NAMES[l] + ' ' + mine[l].pct + '%';
+    });
+    bestEl.textContent = parts.length ? 'Your best on this device: ' + parts.join(' · ') : '';
+  }
+
+  function practice(level, count, seed) {
+    open({
+      title: shortTitle(type.h1),
+      meta: LEVEL_NAMES[level],
+      explainJs: cfg.explainJs,
+      items: P.questions(MSL, type, seed, count, level).map(function (p) { return { type: type, p: p }; }),
+      onClose: function () { showBest(); var b = start.querySelector('button[type="submit"]'); if (b) b.focus(); },
+      onFinish: function (r) {
+        var all = load(STORE), mine = all[type.slug] || {}, prev = mine[level];
+        var record = !prev || r.pct > prev.pct;
+        if (record) { mine[level] = { pct: r.pct, right: r.right, total: r.total, secs: r.secs }; all[type.slug] = mine; save(STORE, all); }
+        var li = P.LEVELS.indexOf(level);
+        var nextLevel = r.pct >= 80 && li < 2 ? P.LEVELS[li + 1] : r.pct < 50 && li > 0 ? P.LEVELS[li - 1] : null;
+        var actions = [];
+        if (nextLevel) actions.push({ label: 'Try ' + LEVEL_NAMES[nextLevel] + ' level', primary: true, run: function () { start.level.value = nextLevel; practice(nextLevel, count, MSL.randomSeed()); } });
+        actions.push({ label: 'New questions', primary: !nextLevel, run: function () { practice(level, count, MSL.randomSeed()); } });
+        actions.push({ label: 'Back to the worksheet', run: close });
+        return { chips: record ? '<li>New best on this device</li>' : '<li>Best: ' + prev.pct + '%</li>', actions: actions };
+      }
+    });
+  }
 })();

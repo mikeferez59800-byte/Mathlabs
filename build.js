@@ -71,8 +71,13 @@ function buildAssets() {
   const explainJs = `(function () { var module = { exports: {} };\n${fs.readFileSync(path.join(ROOT, 'src/explain.js'), 'utf8')}\nself.MSLExplain = module.exports.explain; })();\n`;
   const explainName = `/assets/explain.${hash(explainJs)}.js`;
   write(explainName, explainJs);
+  const qrJs = fs.readFileSync(path.join(ROOT, 'src/qr.js'), 'utf8');
+  const assignJs = fs.readFileSync(path.join(ROOT, 'src/assign.js'), 'utf8');
+  const qrName = `/assets/qr.${hash(qrJs)}.js`, assignName = `/assets/assign.${hash(assignJs)}.js`;
+  write(qrName, qrJs);
+  write(assignName, assignJs);
   write('/favicon.svg', FAVICON);
-  return { css: cssName, js: jsName, ui: uiName, explain: explainName, font: fontName, ...CHAMP.buildAssets({ ROOT, write, hash }) };
+  return { css: cssName, js: jsName, ui: uiName, explain: explainName, qr: qrName, assign: assignName, font: fontName, ...CHAMP.buildAssets({ ROOT, write, hash }) };
 }
 
 const LOGO_MARK = (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>` +
@@ -212,7 +217,7 @@ function footer(lang = 'en') {
 <div class="foot-brand"><a class="logo" href="/">${LOGO('lg-f')}<span>MathSheet<b>Lab</b></span></a><p>${lang === 'en' ? `${esc(config.tagline)}. Answer keys included, no sign-up.` : esc(ch.tagline)}</p></div>
 ${cols}
 ${CHAMP.footerColumn(lang)}
-<div><h2>${esc(ch.footSite)}</h2><ul><li><a href="/about/">${esc(ch.about)}</a></li><li><a href="/contact/">${esc(ch.contact)}</a></li><li><a href="/privacy/">${esc(ch.privacy)}</a></li><li><a href="/terms/">${esc(ch.terms)}</a></li><li><a href="/legal/">${esc(ch.legal)}</a></li>${privacyBtn}</ul></div>
+<div><h2>${esc(ch.footSite)}</h2><ul>${lang === 'en' ? '<li><a href="/assign/">Class assignments</a></li>' : ''}<li><a href="/about/">${esc(ch.about)}</a></li><li><a href="/contact/">${esc(ch.contact)}</a></li><li><a href="/privacy/">${esc(ch.privacy)}</a></li><li><a href="/terms/">${esc(ch.terms)}</a></li><li><a href="/legal/">${esc(ch.legal)}</a></li>${privacyBtn}</ul></div>
 <p class="foot-note">${esc(ch.footNote)} © ${new Date().getFullYear()} ${esc(config.name)}.</p>
 </div></footer>`;
 }
@@ -470,13 +475,106 @@ ${adSlot('bottom')}
   return layout(assets, { title: t.title, desc: t.desc, pathName: typeUrl(t), body, jsonld: ld, bodyClass: 'has-actionbar', ...(t.cat === 'multiplication' ? { css: [assets.champCss] } : {}) });
 }
 
+// Short, stable code per worksheet for assignment links (keeps links short enough for a QR code).
+const assignCode = (t) => MSL.hashString(t.slug).toString(36);
+function validateAssignCodes() {
+  const seen = new Map();
+  for (const t of types) {
+    const c = assignCode(t);
+    if (seen.has(c)) throw new Error(`Assignment code collision: ${t.slug} and ${seen.get(c)} (${c})`);
+    seen.set(c, t.slug);
+  }
+}
+
+// Class assignments: the teacher builds a link here; students open the same page with ?w=... and do the
+// questions online (src/assign.js). Everything runs in the browser; no account and no stored data.
+function assignPage(assets) {
+  validateAssignCodes();
+  const bc = crumbs([{ name: 'Home', path: '/' }, { name: 'Class assignments', path: '/assign/' }]);
+  const catalog = types.map((t) => ({ slug: t.slug, code: assignCode(t), gen: t.gen, params: t.params, h1: t.h1, instruction: t.instruction, grade: t.grade, url: typeUrl(t) }));
+  const options = categories.map((c) => `<optgroup label="${esc(c.name)}">${types.filter((t) => t.cat === c.slug)
+    .map((t) => `<option value="${esc(t.slug)}">${esc(t.h1.replace(/ worksheets?$/i, ''))} (${esc(t.grade)})</option>`).join('')}</optgroup>`).join('');
+  const level = (v, label, sub) => `<label class="seg-opt"><input type="radio" name="level" value="${v}"${v === 'medium' ? ' checked' : ''}><span><strong>${label}</strong><small>${sub}</small></span></label>`;
+  const body = `<section class="page-head dark"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
+<h1>Free online math assignments for your class</h1>
+<p class="lead">Pick up to five skills, share one link or QR code, and students answer on any device with instant feedback. They send you a score code you can check here. No sign-up for you or your students.</p>
+</div></section>
+<div class="wrap page-body">
+<div id="as-teacher">
+<section class="as-panel" aria-labelledby="as-build-h">
+<h2 id="as-build-h">1. Build the assignment</h2>
+<form id="as-form" novalidate>
+<div class="field"><label for="as-pick">Skills (up to 5)</label>
+<div class="as-pick-row"><select id="as-pick"><option value="">Choose a worksheet…</option>${options}</select>
+<button type="button" class="btn btn-secondary" id="as-add">Add</button></div></div>
+<ol class="as-chosen" id="as-chosen" aria-live="polite"></ol>
+<p class="as-empty" id="as-empty">No skill added yet.</p>
+<fieldset class="seg"><legend>Level</legend>${level('easy', 'Easy', 'Smaller numbers')}${level('medium', 'Medium', 'Like the worksheets')}${level('hard', 'Hard', 'Bigger challenge')}</fieldset>
+<div class="field-row">
+<div class="field"><label for="as-q">Questions per skill</label><select id="as-q" name="q"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></div>
+<div class="field"><label for="as-title">Title (optional)</label><input id="as-title" name="t" type="text" maxlength="60" placeholder="e.g. Week 3 homework"></div>
+</div>
+<button type="submit" class="btn btn-primary btn-lg" id="as-create">Create the link</button>
+<p class="as-error" id="as-error" role="alert"></p>
+</form>
+</section>
+<section class="as-panel" id="as-share" hidden aria-labelledby="as-share-h">
+<h2 id="as-share-h">2. Share it with your students</h2>
+<div class="as-share-grid">
+<div class="as-qr" id="as-qr"></div>
+<div>
+<div class="field"><label for="as-link">Assignment link</label><input id="as-link" type="text" readonly></div>
+<div class="as-buttons"><button type="button" class="btn btn-primary" id="as-copy">Copy link</button><a class="btn btn-secondary" id="as-try" href="#" target="_blank" rel="noopener">Try it as a student</a></div>
+<p class="as-note">Every student gets the same questions, so scores are comparable. Show the QR code on the board, or paste the link in your class page or e-mail.</p>
+</div>
+</div>
+</section>
+<section class="as-panel" aria-labelledby="as-check-h">
+<h2 id="as-check-h">3. Check the results</h2>
+<p>At the end, each student gets a result line such as <code>Lea — 18/20 — 4:32 — try 1 — K7Q2MD</code> to copy and send you. Paste the lines below: the code shows whether a line belongs to this assignment and was not edited.</p>
+<div class="field"><label for="as-check-link">Assignment link</label><input id="as-check-link" type="text" placeholder="Paste the assignment link"></div>
+<div class="field"><label for="as-results">Result lines (one per student)</label><textarea id="as-results" rows="6" placeholder="Lea — 18/20 — 4:32 — try 1 — K7Q2MD"></textarea></div>
+<button type="button" class="btn btn-secondary" id="as-verify">Check results</button>
+<div id="as-table" aria-live="polite"></div>
+</section>
+<section class="content as-about">
+<h2>How it works</h2>
+<ol><li>Choose the skills, the level and the number of questions. Questions come from the same generators as the printable worksheets.</li><li>Share the link or the QR code. Students open it on a phone, tablet or computer and type a first name or nickname.</li><li>They answer one question at a time, see the right answer and a step-by-step explanation after a mistake, and get a score.</li><li>They send you their result line; paste the lines here to see everyone’s score in a table.</li></ol>
+<h2>Privacy</h2>
+<p>Nothing is stored on our servers: the assignment is entirely in the link, and the student’s answers and nickname stay on their device. A result line only leaves the device if the student copies and sends it. Ask students to use a first name or nickname, never a full name. The check code lets you spot a line that was edited by hand; it cannot prove who typed the answers.</p>
+</section>
+</div>
+<div id="as-student" hidden>
+<section class="as-panel as-student-panel" aria-labelledby="as-st-h">
+<p class="kicker">Class assignment</p>
+<h2 id="as-st-h"></h2>
+<ul class="as-skills" id="as-st-skills"></ul>
+<form id="as-st-form" novalidate>
+<div class="field"><label for="as-name">Your first name or nickname</label><input id="as-name" type="text" maxlength="24" autocomplete="off" placeholder="e.g. Lea"></div>
+<p class="as-note">Don’t type your full name. It stays on this device and only appears on the result you choose to send.</p>
+<button type="submit" class="btn btn-primary btn-lg">Start</button>
+<p class="as-error" id="as-st-error" role="alert"></p>
+</form>
+</section>
+</div>
+<noscript><p class="notice">Class assignments need JavaScript.</p></noscript>
+</div>
+<script type="application/json" id="as-config">${JSON.stringify({ catalog, explainJs: assets.explain }).replace(/</g, '\\u003c')}</script>`;
+  return layout(assets, {
+    title: `Free Online Math Assignments for Teachers, No Sign-Up | ${config.name}`,
+    desc: 'Create a free online math assignment in seconds: pick skills, share a link or QR code, students get instant feedback and send you a checkable score. No accounts.',
+    pathName: '/assign/', body, jsonld: [bc.ld], js: [assets.qr, assets.assign]
+  });
+}
+
 // Online practice entry point (the practice itself runs in a dialog, see src/practice-ui.js).
 function practiceCard(t) {
   const level = (v, label, sub) => `<label class="seg-opt"><input type="radio" name="level" value="${v}"${v === 'medium' ? ' checked' : ''}><span><strong>${label}</strong><small>${sub}</small></span></label>`;
   return `<section class="practice-card no-print" id="practice" aria-labelledby="pr-h">
 <div class="pr-card-text"><p class="kicker">Answer on screen</p><h2 id="pr-h">Practice online</h2>
 <p>Answer the problems right here, one at a time. Each answer is checked instantly, with a step-by-step explanation after a mistake and a score at the end. No account needed, and nothing is sent to our servers.</p>
-<p class="pr-best" id="pr-best"></p></div>
+<p class="pr-best" id="pr-best"></p>
+<p class="pr-teacher"><a href="/assign/?add=${esc(t.slug)}">Teachers: assign this to your class</a> (one link, no sign-up).</p></div>
 <form id="pr-start" class="pr-start">
 <fieldset class="seg"><legend>Level</legend>${level('easy', 'Easy', 'Smaller numbers')}${level('medium', 'Medium', 'Like the worksheet')}${level('hard', 'Hard', 'Bigger challenge')}</fieldset>
 <div class="pr-start-row"><div class="field"><label for="pr-n">Questions</label><select id="pr-n" name="n"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></div>
@@ -543,6 +641,7 @@ function staticPages(assets) {
 <p>Last updated: ${today}.</p>
 <h2>Summary</h2>
 <p>${esc(config.name)} does not require an account and does not ask for your name, email or any other personal information. Worksheets are generated entirely in your browser; the options you choose and any title you type stay on your device and are only placed in the page address so the link can reproduce the sheet.</p>
+<p>Online practice and <a href="/assign/">class assignments</a> also run entirely in your browser. Answers are checked on your device and are never sent to us. Your best scores, display preferences, nickname and number of tries are kept only in your browser’s local storage, which you can clear at any time. A class assignment result leaves your device only if you copy it and send it yourself.</p>
 <p>The optional <a href="/multiplication-championship/">Multiplication World Championship</a> works with a nickname and a country only; see the section about it below.</p>
 <h2>Hosting, server logs and visit statistics</h2>
 <p>The site is hosted by ${esc(config.host.name)}. Like any web host, it processes technical data such as your IP address, browser type and the pages requested, in order to deliver the site and protect it against abuse. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare’s privacy policy</a>.</p>
@@ -627,6 +726,7 @@ function main() {
   add('/', homePage(assets));
   for (const c of categories) add(`/${c.slug}/`, categoryPage(assets, c));
   for (const t of types) add(typeUrl(t), worksheetPage(assets, t));
+  add('/assign/', assignPage(assets));
   for (const e of CHAMP.buildPages({ assets, layout, write, abs, esc, crumbs, adSlot, config, ICON })) {
     write(e.p + 'index.html', e.html);
     if (e.index) entries.push({ p: e.p, html: e.html });
