@@ -14,6 +14,15 @@ jobs:
       - run: node scripts/test-engine.js
       - run: node build.js
       - run: node scripts/check-site.js
+  championship:
+    # Championship rules, API, anti-cheat, month closing and load test (needs node:sqlite, Node 22+).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/test-championship.mjs
   print:
     # Prints every worksheet (all counts, A4 and Letter, Classic and Large print, with answer key)
     # in Chromium and checks nothing is cut, overlapping, missing or out of sync.

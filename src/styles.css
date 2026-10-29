@@ -151,6 +151,7 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 }
 .site-head.is-scrolled { background: rgba(11, 16, 32, .86); border-bottom-color: var(--border-dark); box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .5); }
 .head-row { display: flex; align-items: center; gap: var(--s5); height: 100%; }
+.site-head .wrap { max-width: 1440px; }
 .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.0625rem; letter-spacing: -.02em; color: #fff; text-decoration: none; flex: none; }
 .logo:hover { color: #fff; }
 .logo svg { width: 30px; height: 30px; filter: drop-shadow(0 4px 10px rgba(99, 102, 241, .45)); }
@@ -158,13 +159,18 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 .nav { margin-left: auto; }
 .nav ul { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; }
 .nav a {
-  display: block; position: relative; padding: 8px 10px; border-radius: 10px; font-size: .875rem; font-weight: 500;
+  display: block; position: relative; padding: 8px 7px; border-radius: 10px; font-size: .8125rem; font-weight: 500;
   color: var(--muted-on-dark); text-decoration: none; white-space: nowrap; transition: color var(--t-micro) ease, background-color var(--t-micro) ease;
 }
 .nav a:hover { color: #fff; background: rgba(255, 255, 255, .06); }
 .nav a[aria-current="page"] { color: #fff; }
-.nav a[aria-current="page"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--grad-primary); }
+.nav a[aria-current="page"]::after { content: ""; position: absolute; left: 7px; right: 7px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--grad-primary); }
 .head-cta { flex: none; }
+/* Championship link: gold accent, first item of the menu. */
+.nav .nav-champ a { display: flex; align-items: center; gap: 6px; color: #FCD679; }
+.nav .nav-champ a:hover { color: #FDE6A8; background: rgba(245, 184, 61, .10); }
+.nav .nav-champ svg { width: 16px; height: 16px; flex: none; }
+.nav .nav-champ a[aria-current="page"]::after { background: linear-gradient(90deg, #F5B83D, #FCD679); }
 .nav-toggle {
   display: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: auto; padding: 0;
   border: 1px solid rgba(255, 255, 255, .14); border-radius: var(--r-btn); background: rgba(255, 255, 255, .06); color: #fff; cursor: pointer;
@@ -174,7 +180,8 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 .nav-open .nav-toggle .i-open { display: none; }
 .nav-open .nav-toggle .i-close { display: block; }
 
-@media (max-width: 1100px) {
+/* The full menu (championship + 9 topics + button) needs about 1,390 px: below that, the menu button is used. */
+@media (max-width: 1399px) {
   .head-row { gap: var(--s3); }
   .nav-toggle { display: inline-flex; }
   .head-cta { order: 2; }
@@ -196,6 +203,8 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
   .js .nav a { padding: 12px 14px; font-size: 1rem; color: var(--text-on-dark); background: rgba(255, 255, 255, .03); }
   .js .nav a[aria-current="page"] { background: rgba(99, 102, 241, .18); }
   .js .nav a[aria-current="page"]::after { display: none; }
+  .js .nav .nav-champ { grid-column: 1 / -1; }
+  .js .nav .nav-champ a { color: #FCD679; background: rgba(245, 184, 61, .10); border: 1px solid rgba(245, 184, 61, .22); }
 }
 @media (max-width: 420px) { .head-cta { display: none; } }
 
@@ -535,7 +544,7 @@ svg.arrow { width: 16px; height: 16px; flex: none; }
 /* ---------- Footer ---------- */
 .site-foot { margin-top: var(--s9); padding: var(--s8) 0 var(--s6); background: var(--bg-dark); color: var(--muted-on-dark); font-size: .875rem; overflow: hidden; }
 .site-foot .glow { left: 50%; top: -700px; transform: translateX(-50%); }
-.foot-grid { display: grid; gap: var(--s6); grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); }
+.foot-grid { display: grid; gap: var(--s6); grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); }
 @media (max-width: 860px) { .foot-grid { grid-template-columns: 1fr 1fr; } .foot-brand { grid-column: 1 / -1; } }
 .foot-brand p { margin: var(--s4) 0 0; max-width: 26em; }
 .site-foot h2 { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 var(--s4); color: var(--text-on-dark); }

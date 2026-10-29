@@ -1,7 +1,7 @@
 # MathSheetLab
 
 Générateur gratuit de fiches d'exercices de maths imprimables (site en anglais, pour un public international).
-Site 100 % statique : aucune base de données, aucun serveur, aucune dépendance npm. Il tourne gratuitement sur Cloudflare Pages, 24 h/24.
+Site statique sans dépendance npm, sur Cloudflare Pages (gratuit, 24 h/24). Seul le **Multiplication World Championship** (`/multiplication-championship/`) utilise un petit serveur : une Pages Function sur `/api/championship/*` et une base Cloudflare D1. Voir `docs/CHAMPIONNAT.md` (architecture, anti-triche, données, mise en service).
 
 - 61 types de fiches (addition, soustraction, tables de multiplication, division posée, fractions, décimaux, arrondis, entiers relatifs, priorités opératoires, puissances, pourcentages).
 - Problèmes générés dans le navigateur, nombre illimité de fiches, corrigé automatique sur une 2e page.
@@ -23,6 +23,7 @@ node scripts/make-print-samples.js   # (après un build) PDF des fiches témoins
 npm run serve                 # build + aperçu local sur http://localhost:8080 (nécessite Python 3)
 SITE_URL=https://votre-site.pages.dev node scripts/check-live.js   # contrôle du site en ligne
 node scripts/make-og.js       # (après un build) régénère les images de partage dans static/og/ ; nécessite Playwright
+node scripts/test-championship.mjs   # championnat : règles, API, sécurité, charge (Node 22+)
 ```
 
 ## Structure
@@ -39,6 +40,9 @@ src/app.js              Interface : options, nouvelles fiches, impression, copie
 src/styles.css          Styles écran + impression, mode sombre
 scripts/                Tests du moteur, contrôle du site construit, contrôle du site en ligne
 .github/workflows/      CI (tests à chaque push) et contrôle hebdomadaire du site en ligne
+src/championship/      Championnat : règles, API, schéma D1, textes EN/FR/JA, pages, script du jeu
+functions/              Point d'entrée Cloudflare Pages Functions (API du championnat)
+migrations/             Migrations SQL D1 (générées depuis src/championship/schema.mjs)
 data/lastmod.json       Dates de dernière modification réelles pour le sitemap (mises à jour automatiquement)
 docs/                   Tutoriel de mise en ligne, procédure AdSense et obligations légales
 ```
@@ -63,5 +67,9 @@ docs/                   Tutoriel de mise en ligne, procédure AdSense et obligat
 | `ADSENSE_CLIENT` | `ca-pub-…` : ajoute la balise de validation AdSense et `ads.txt` (sans afficher de pub) |
 | `ADS_ENABLED` | `true` **uniquement après approbation AdSense** : charge le script et les blocs d'annonces |
 | `ADSENSE_SLOT_TOP`, `ADSENSE_SLOT_BOTTOM` | Identifiants des blocs d'annonces créés dans AdSense |
+| `ADMIN_TOKEN` (secret) | Mot de passe de l'admin du championnat (24 caractères ou plus) |
+| `RATE_LIMIT_SALT` (secret, facultatif) | Sel des empreintes réseau du championnat |
+
+Liaison D1 : `DB` → base `mathsheetlab-championship` (voir `docs/CHAMPIONNAT.md`, section 3).
 
 Voir `docs/DEPLOIEMENT.md` pour la mise en ligne pas à pas.
