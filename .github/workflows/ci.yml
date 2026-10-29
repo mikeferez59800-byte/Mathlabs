@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/test-engine.js
+      - run: node scripts/test-practice.js
       - run: node build.js
       - run: node scripts/check-site.js
   championship:
@@ -32,6 +33,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm i --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+      - run: npm i --no-save playwright@1.63.0 jsqr@1.4.0 && npx playwright install --with-deps chromium
+      - run: node scripts/test-qr.js
       - run: node build.js
       - run: node scripts/test-print.js
