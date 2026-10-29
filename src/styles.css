@@ -853,3 +853,11 @@ dialog.pr-dlg.pr-rd .pr-problem { letter-spacing: .08em; }
   .sheet-key .ans, .sheet-key .pv-ans, .pld-q { color: #000; }
   a { color: #000; text-decoration: none; }
 }
+
+/* ---------- Japanese 九九 page ---------- */
+.kuku-scroll { overflow-x: auto; margin: var(--s4) 0; }
+.kuku-grid { border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 100%; }
+.kuku-grid caption { text-align: left; font-weight: 600; margin-bottom: 8px; color: #334155; }
+.kuku-grid th, .kuku-grid td { border: 1px solid #E2E8F0; padding: 6px 8px; text-align: center; }
+.kuku-grid thead th, .kuku-grid tbody th { background: #EEF2FF; color: #3730A3; white-space: nowrap; }
+.kuku-cta { margin-top: var(--s6); }
