@@ -35,6 +35,8 @@ site.config.js          Nom du site, URL, e-mail de contact, réglages AdSense (
 build.js                Générateur du site (pages, sitemap, robots.txt, _headers, ads.txt)
 src/catalog.js          Catalogue des fiches : 1 entrée = 1 page (titre, description, textes, paramètres)
 src/explain.js          Exemples résolus pas à pas (un par fiche), vérifiés par les tests
+src/mistakes.js         « Erreurs fréquentes » de chaque fiche (par générateur), avec la façon de les corriger
+src/grades.js           Pages par niveau scolaire (/3rd-grade-math-worksheets/...) : textes et liste des fiches de chaque niveau
 static/og/              Images de partage 1200x630 (réseaux sociaux, Pinterest), copiées telles quelles dans dist/
 src/engine.js           Moteur : générateurs de problèmes + rendu HTML d'un exercice (partagé navigateur / build / tests)
 src/layout.js           Mise en page imprimable : familles A à F, pagination A4 / Letter, corrigé, styles Classic / Large print

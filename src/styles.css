@@ -836,6 +836,29 @@ dialog.pr-dlg.pr-rd .pr-problem { letter-spacing: .08em; }
   .as-qr { max-width: 240px; }
 }
 
+/* Grade hubs, skill path, common mistakes */
+.grade-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--s3); margin: 0; padding: 0; list-style: none; }
+.grade-grid a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: var(--s4) var(--s2); border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); text-align: center; transition: transform var(--t-micro) var(--ease), border-color var(--t-micro); }
+.grade-grid a:hover, .grade-grid a[aria-current] { border-color: var(--primary); transform: translateY(-2px); }
+.grade-grid b { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--grad-primary); color: #fff; font-size: 1.25rem; }
+.grade-grid span { font-weight: 600; font-size: .9375rem; }
+.grade-grid small { color: var(--muted); font-size: .75rem; }
+@media (max-width: 1024px) { .grade-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .grade-grid { gap: var(--s2); } .grade-grid a { padding: var(--s3) 4px; } .grade-grid span { font-size: .75rem; } .grade-grid small { font-size: .6875rem; } .grade-grid b { width: 36px; height: 36px; font-size: 1.05rem; } }
+.grade-intro { margin-bottom: var(--s6); }
+.grade-more { margin-top: var(--s7); }
+.grade-more .grade-grid { margin-top: var(--s4); }
+.mistakes { list-style: none; padding: 0 !important; }
+.mistakes li { padding: 12px 16px; margin-bottom: var(--s2); border-left: 3px solid var(--primary); background: var(--surface); border-radius: 0 var(--r-btn) var(--r-btn) 0; }
+.mistakes strong { display: block; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+.skill-path { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); max-width: 46em; margin: var(--s6) 0 0; }
+.path-step { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-radius: var(--r-card); border: 1px solid var(--border); background: var(--surface); text-decoration: none; color: var(--text); font-weight: 600; }
+.path-step:last-child:not(:first-child) { text-align: right; }
+.path-step:hover { border-color: var(--primary); }
+.path-step small { color: var(--muted); font-weight: 500; font-size: .8125rem; }
+.grade-line { font-size: .9375rem; }
+@media (max-width: 640px) { .skill-path { grid-template-columns: 1fr; } .path-step:last-child:not(:first-child) { text-align: left; } }
+
 /* ---------- Print: only the worksheet(s) ---------- */
 @page { margin: 0; }
 @media print {

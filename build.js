@@ -16,6 +16,8 @@ const MSL = require('./src/engine');
 const LAYOUT = require('./src/layout');
 const { explain } = require('./src/explain');
 const CHAMP = require('./src/championship/pages');
+const { grades, gradesOf } = require('./src/grades');
+const { mistakesFor } = require('./src/mistakes');
 const { T: CT } = require('./src/championship/i18n');
 const { kukuPage, KUKU_PATH } = require('./src/kuku-ja');
 
@@ -33,6 +35,9 @@ const abs = (p) => config.url + p;
 const catBySlug = Object.fromEntries(categories.map((c) => [c.slug, c]));
 const typeBySlug = Object.fromEntries(types.map((t) => [t.slug, t]));
 const typeUrl = (t) => `/${t.cat}/${t.slug}/`;
+const gradeUrl = (g) => `/${g.slug}/`;
+const gradeByN = Object.fromEntries(grades.map((g) => [g.n, g]));
+const typesForGrade = (g) => types.filter((t) => gradesOf(t).includes(g.n));
 
 function write(rel, content) {
   const file = path.join(DIST, rel);
@@ -259,6 +264,10 @@ function sampleSheets(slug, count, withKey) {
   return { seed, sheet: MSL.renderSheet(ct, problems, opts), key: withKey ? MSL.renderSheet(ct, problems, { ...opts, answers: true }) : '' };
 }
 
+function gradeLinks(current) {
+  return `<ul class="grade-grid">${grades.map((g) => `<li><a href="${gradeUrl(g)}"${g === current ? ' aria-current="page"' : ''}><b>${esc(g.short)}</b><span>${esc(g.name)}</span><small>${typesForGrade(g).length} worksheets</small></a></li>`).join('')}</ul>`;
+}
+
 function catCard(c, i = 0) {
   const n = types.filter((t) => t.cat === c.slug).length;
   return `<li class="cat-card reveal" style="--d:${i % 4}"><span class="cat-icon">${catIcon(c.slug)}</span><h3><a class="stretch" href="/${c.slug}/">${esc(c.name)}</a></h3><p>${esc(c.blurb)}</p><span class="cat-count">${n} worksheets ${ICON.arrow}</span></li>`;
@@ -317,6 +326,13 @@ ${stack}
 <div class="wrap">
 <div class="section-head reveal"><p class="kicker">Browse by topic</p><h2 id="cats-h">Every core skill, from first sums to pre‑algebra</h2><p>${categories.length} topics and ${types.length} focused generators. Each one makes a new printable sheet in one click.</p></div>
 <ul class="cat-grid">${catCards}</ul>
+</div>
+</section>
+
+<section class="section grades-sec" aria-labelledby="grades-h">
+<div class="wrap">
+<div class="section-head reveal"><p class="kicker">Browse by grade</p><h2 id="grades-h">Math worksheets for every grade, K to 7</h2><p>Every worksheet that fits a grade, grouped by topic, with what students usually learn that year.</p></div>
+${gradeLinks()}
 </div>
 </section>
 
@@ -456,12 +472,15 @@ ${adSlot('top')}
 ${t.intro.slice(1).map((p) => `<p>${esc(p)}</p>`).join('')}
 <p>Each sheet contains ${t.counts.join(', ').replace(/, (\d+)$/, ' or $1')} problems (your choice) and is generated at random. Press “New problems” as many times as you like; there is no limit and no account needed.</p>
 ${worked}
+${mistakesHtml(t)}
 <h2>Teaching tips</h2>
 <ul>${t.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
 <h2>How to print or save as PDF</h2>
 <ol><li>Choose the options on the left (on a phone, above the preview).</li><li>Press <strong>Print / Save as PDF</strong>.</li><li>In the print window, pick your printer, or choose “Save as PDF” as the destination.</li></ol>
 <p>Only the worksheet and its answer key are printed; menus and buttons are hidden automatically.</p>
+<p class="grade-line">Grade level: ${gradesOf(t).map((n) => `<a href="${gradeUrl(gradeByN[n])}">${esc(gradeByN[n].h1)}</a>`).join(' · ')}</p>
 </section>
+${skillPath(t)}
 ${related.length ? `<section class="related"><h2>Related worksheets</h2><ul>${related.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${siblings.length ? `<section class="related"><h2>More ${esc(c.name.toLowerCase())} worksheets</h2><ul>${siblings.map((r) => `<li><a href="${typeUrl(r)}">${esc(r.h1)}</a></li>`).join('')}</ul></section>` : ''}
 ${adSlot('bottom')}
@@ -566,6 +585,56 @@ function assignPage(assets) {
     desc: 'Create a free online math assignment in seconds: pick skills, share a link or QR code, students get instant feedback and send you a checkable score. No accounts.',
     pathName: '/assign/', body, jsonld: [bc.ld], js: [assets.qr, assets.assign]
   });
+}
+
+function mistakesHtml(t) {
+  const list = mistakesFor(t);
+  if (!list.length) return '';
+  return `<h2>Common mistakes and how to fix them</h2>
+<ul class="mistakes">${list.map(([m, f]) => `<li><strong>${esc(m)}</strong> ${esc(f)}</li>`).join('')}</ul>`;
+}
+
+// Previous and next worksheet in the same topic (the catalog lists each topic from easiest to hardest).
+function skillPath(t) {
+  const list = types.filter((x) => x.cat === t.cat), i = list.indexOf(t);
+  const prev = list[i - 1], next = list[i + 1];
+  if (!prev && !next) return '';
+  const link = (x, label) => `<a class="path-step" href="${typeUrl(x)}"><small>${label}</small><span>${esc(x.h1)}</span></a>`;
+  return `<nav class="skill-path no-print" aria-label="Skill path">${prev ? link(prev, 'Before this') : '<span></span>'}${next ? link(next, 'Next step') : ''}</nav>`;
+}
+
+function gradePage(assets, g) {
+  const list = typesForGrade(g);
+  const bc = crumbs([{ name: 'Home', path: '/' }, { name: g.name, path: gradeUrl(g) }]);
+  const groups = categories.map((c) => {
+    const ofCat = list.filter((t) => t.cat === c.slug);
+    if (!ofCat.length) return '';
+    return `<section class="group" aria-labelledby="g-${c.slug}"><div class="cat-head"><h2 id="g-${c.slug}">${catIcon(c.slug)}${esc(c.name)}</h2><a href="/${c.slug}/">All ${esc(c.name.toLowerCase())} worksheets</a></div><ul class="cards">${ofCat.map(card).join('')}</ul></section>`;
+  }).join('\n');
+  const prev = gradeByN[g.n - 1], next = gradeByN[g.n + 1];
+  const body = `<section class="page-head dark ws-intro"><div class="glow" aria-hidden="true"></div><div class="wrap">${bc.html}
+<h1>${esc(g.h1.charAt(0).toUpperCase() + g.h1.slice(1))}</h1>
+<ul class="chips meta" aria-label="About these worksheets"><li>${ICON.grad}${esc(g.name)}</li><li>${list.length} worksheets</li><li>Free</li><li>Answer keys included</li><li>Online practice</li></ul>
+<p class="lead">${esc(g.intro[0])}</p></div></section>
+<div class="wrap page-body">
+<section class="content grade-intro">
+<p>${esc(g.intro[1])}</p>
+<h2>What ${esc(g.name.toLowerCase() === 'kindergarten' ? 'kindergarten' : g.name)} students practice here</h2>
+<ul>${g.focus.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+<p>Every worksheet generates new problems each time, prints with an answer key on page 2, and can also be done online with instant checking. Teachers can <a href="/assign/">send several of them as one online assignment</a>, with no sign-up.</p>
+</section>
+${groups}
+<section class="content grade-more">
+<h2>Other grades</h2>
+<p>${prev ? `Need a review? See the <a href="${gradeUrl(prev)}">${esc(prev.h1)}</a>. ` : ''}${next ? `Ready for more? Try the <a href="${gradeUrl(next)}">${esc(next.h1)}</a>.` : ''}</p>
+${gradeLinks(g)}
+</section>
+</div>`;
+  const ld = [bc.ld, {
+    '@context': 'https://schema.org', '@type': 'CollectionPage', name: g.h1, url: abs(gradeUrl(g)), educationalLevel: g.name,
+    hasPart: list.map((t) => ({ '@type': 'LearningResource', name: t.h1, url: abs(typeUrl(t)) }))
+  }];
+  return layout(assets, { title: `${g.title}`, desc: g.desc, pathName: gradeUrl(g), body, jsonld: ld });
 }
 
 // Online practice entry point (the practice itself runs in a dialog, see src/practice-ui.js).
@@ -727,6 +796,7 @@ function main() {
   add('/', homePage(assets));
   for (const c of categories) add(`/${c.slug}/`, categoryPage(assets, c));
   for (const t of types) add(typeUrl(t), worksheetPage(assets, t));
+  for (const g of grades) add(gradeUrl(g), gradePage(assets, g));
   add('/assign/', assignPage(assets));
   for (const e of CHAMP.buildPages({ assets, layout, write, abs, esc, crumbs, adSlot, config, ICON })) {
     write(e.p + 'index.html', e.html);
