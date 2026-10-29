@@ -88,7 +88,8 @@
   function fillLive(root, st) {
     var q = function (sel) { return root.querySelector(sel); };
     var offset = st.serverNow - Date.now();
-    if (q('[data-w-month]')) q('[data-w-month]').textContent = fmt(T.common.monthChampionship, { month: monthLabel(st.month) });
+    var upcoming = !!st.opensAt; // before the first official month: show that month and count down to its start
+    if (q('[data-w-month]')) q('[data-w-month]').textContent = fmt(T.common.monthChampionship, { month: monthLabel(upcoming ? st.firstMonth : st.month) });
     var pods = root.querySelectorAll('.pod');
     Array.prototype.forEach.call(pods, function (li) {
       var r = st.podium[+li.getAttribute('data-rank') - 1];
@@ -98,7 +99,7 @@
       li.querySelector('[data-pod-score]').textContent = num(r.score);
     });
     var ends = q('[data-w-ends]');
-    var tick = function () { if (ends) ends.textContent = T.landing.endsIn + ' ' + duration(st.endsAt - (Date.now() + offset)); };
+    var tick = function () { if (ends) ends.textContent = upcoming ? T.landing.startsIn + ' ' + duration(st.opensAt - (Date.now() + offset)) : T.landing.endsIn + ' ' + duration(st.endsAt - (Date.now() + offset)); };
     tick(); setInterval(tick, 1000);
     if (q('[data-w-players]')) q('[data-w-players]').textContent = fmt(T.landing.playersGames, { p: num(st.participants), g: num(st.games) });
   }
@@ -361,6 +362,20 @@
 
   // ---------- pages ----------
   function loadStatus() { return api('GET', 'status'); }
+  // Before the first official month: the date it opens, in the page language (UTC).
+  function opensText(st) {
+    if (!st || !st.opensAt) return '';
+    var date;
+    try { date = new Intl.DateTimeFormat(LANG, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(st.opensAt)); }
+    catch (e) { date = new Date(st.opensAt).toISOString().slice(0, 10); }
+    return fmt(T.play.opensOn, { date: date });
+  }
+  function showOpens(text) {
+    var el = $('soon'); if (!el) return;
+    if (el.firstChild && el.firstChild.nodeType === 3) el.firstChild.nodeValue = text + ' ';
+    else el.insertBefore(document.createTextNode(text + ' '), el.firstChild);
+    show('loading', false); show('soon', true);
+  }
 
   function landingPage() {
     loadStatus().then(function (r) {
@@ -368,9 +383,10 @@
         $('top10').innerHTML = '<p class="muted">' + esc(r.data.error === 'not_configured' ? T.play.soon : T.board.offline) + '</p>';
         return;
       }
+      if (r.data.opensAt) $('top10').innerHTML = '<p class="muted">' + esc(opensText(r.data)) + '</p>';
       var live = document.querySelector('[data-champ-live]');
       if (live) fillLive(live, r.data);
-      api('GET', 'leaderboard').then(function (lb) {
+      if (!r.data.opensAt) api('GET', 'leaderboard').then(function (lb) {
         if (lb.status === 200) $('top10').innerHTML = boardTable(lb.data.rows.slice(0, 10));
       });
       var lc = r.data.lastChampion;
@@ -420,6 +436,7 @@
     };
     loadStatus().then(function (r) {
       if (r.data.error === 'not_configured') { show('loading', false); show('soon', true); return; }
+      if (r.data.opensAt) { showOpens(opensText(r.data)); return; }
       refreshReady();
     });
   }

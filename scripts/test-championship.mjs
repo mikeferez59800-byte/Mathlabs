@@ -28,7 +28,7 @@ function makeEnv(startIso = '2026-10-15T12:00:00Z', extra = {}) {
   _resetForTests();
   const clock = { t: Date.parse(startIso) };
   const DB = createD1();
-  return { DB, clock, env: { DB, ADMIN_TOKEN: ADMIN, __now: () => clock.t, ...extra } };
+  return { DB, clock, env: { DB, ADMIN_TOKEN: ADMIN, CHAMPIONSHIP_FIRST_MONTH: '2026-01', __now: () => clock.t, ...extra } };
 }
 let ipCounter = 1;
 async function call(E, method, p, { body, cookie, origin = ORIGIN, ip, headers = {}, rawBody } = {}) {
@@ -494,6 +494,18 @@ await test('errors are logged for the admin page without leaking details to play
   const r = await call(E, 'GET', 'status');
   assert.equal(r.status, 500);
   assert.deepEqual(r.data, { error: 'server_error' });
+});
+
+await test('first official month: no official game before it, status gives the opening date', async () => {
+  const E = makeEnv('2026-11-30T23:58:00Z', { CHAMPIONSHIP_FIRST_MONTH: undefined });
+  const p = await newPlayer(E);
+  let st = await call(E, 'GET', 'status');
+  assert.equal(st.data.opensAt, Date.UTC(2026, 11, 1));
+  assert.equal((await call(E, 'POST', 'start', { cookie: p.cookie })).data.error, 'not_open');
+  E.clock.t = Date.parse('2026-12-01T00:00:00Z'); _resetForTests();
+  st = await call(E, 'GET', 'status');
+  assert.equal(st.data.opensAt, null);
+  assert.equal((await call(E, 'POST', 'start', { cookie: p.cookie })).status, 200);
 });
 
 // ================= load =================

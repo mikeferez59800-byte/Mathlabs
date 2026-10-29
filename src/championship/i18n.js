@@ -37,7 +37,7 @@ const en = {
     lead: 'Sixty seconds. The times tables from 2 to 12. One world ranking. Play as often as you like: your best score of the month counts, and the month’s winner becomes World Champion.',
     join: 'Join the Championship', practice: 'Practice first',
     facts: ['100% free', 'No e-mail, no real name', 'Same rules for everyone'],
-    liveTitle: 'Current championship', endsIn: 'Ends in', playersGames: 'Players: {p} · Games played: {g}',
+    liveTitle: 'Current championship', endsIn: 'Ends in', startsIn: 'Starts in', playersGames: 'Players: {p} · Games played: {g}',
     stepsKicker: 'How it works', stepsH: 'Three steps to the podium',
     steps: [
       ['Choose a nickname', 'Pick a fun nickname and the country you want to represent. No e-mail and no real name: we even suggest a nickname for you.'],
@@ -107,6 +107,7 @@ const en = {
     h1: 'World Championship — 60 seconds',
     lead: 'Official round: multiplications from 2 to 12, one at a time, for exactly 60 seconds. Your best score of the month counts in the world leaderboard.',
     soon: 'The official championship opens very soon. In the meantime, warm up in practice mode!',
+    opensOn: 'The first official championship starts on {date} (UTC). Until then, warm up in practice mode!',
     signupH: 'Create your player profile', signupP: 'Choose a nickname and the country you want to represent. That is all we need.',
     nickname: 'Nickname', nickHelp: '3 to 16 letters or digits. Do not use your real name.', suggest: 'Suggest another', country: 'Country', countryHelp: 'The flag shown next to your nickname. Choose freely.',
     under13: 'Under 13? Please ask a parent or teacher before creating a profile.',
@@ -127,7 +128,7 @@ const en = {
     invalid: 'This game could not be validated (impossible timing or connection problem), so it does not count.',
     rankNow: 'You are #{rank} in {month}.', again: 'Play again', seeBoard: 'See the leaderboard',
     share: 'Share my score', shareText: 'I scored {n} points in the MathSheetLab World Championship. Can you beat me?', shareDone: 'Image downloaded and text copied: paste it wherever you like.',
-    errors: { nick_taken: 'This nickname is already taken. Try another one.', nick_offensive: 'This nickname is not allowed. Please choose a friendly one.', nick_reserved: 'This nickname is reserved. Please choose another one.', nick_length: 'Use 3 to 16 characters.', nick_chars: 'Use only letters, digits, - and _ (no spaces).', nick_digits: 'Too many digits: do not use dates, phone numbers or codes.', nick_mixed: 'Please use a single alphabet in your nickname.', bad_country: 'Please choose a country.', bad_code: 'This recovery code is not valid.', rate_limited: 'Too many attempts. Please wait a little and try again.', profile_cooldown: 'You can change your profile again in a few days.', busy: 'The championship is very busy right now. Please try again in a few minutes.', generic: 'Something went wrong. Please try again.' }
+    errors: { nick_taken: 'This nickname is already taken. Try another one.', nick_offensive: 'This nickname is not allowed. Please choose a friendly one.', nick_reserved: 'This nickname is reserved. Please choose another one.', nick_length: 'Use 3 to 16 characters.', nick_chars: 'Use only letters, digits, - and _ (no spaces).', nick_digits: 'Too many digits: do not use dates, phone numbers or codes.', nick_mixed: 'Please use a single alphabet in your nickname.', bad_country: 'Please choose a country.', bad_code: 'This recovery code is not valid.', rate_limited: 'Too many attempts. Please wait a little and try again.', profile_cooldown: 'You can change your profile again in a few days.', busy: 'The championship is very busy right now. Please try again in a few minutes.', not_open: 'The official championship has not started yet.', generic: 'Something went wrong. Please try again.' }
   },
   practice: {
     h1: 'Multiplication practice',
@@ -184,7 +185,7 @@ const fr = {
     lead: 'Soixante secondes. Les tables de 2 à 12. Un seul classement mondial. Joue autant de fois que tu veux : ton meilleur score du mois compte, et le premier du mois devient champion du monde.',
     join: 'Rejoindre le championnat', practice: 'S’entraîner d’abord',
     facts: ['100 % gratuit', 'Ni e-mail, ni vrai nom', 'Mêmes règles pour tous'],
-    liveTitle: 'Championnat en cours', endsIn: 'Fin dans', playersGames: 'Joueurs\u00a0: {p} · Parties jouées\u00a0: {g}',
+    liveTitle: 'Championnat en cours', endsIn: 'Fin dans', startsIn: 'Début dans', playersGames: 'Joueurs\u00a0: {p} · Parties jouées\u00a0: {g}',
     stepsKicker: 'Comment ça marche', stepsH: 'Trois étapes jusqu’au podium',
     steps: [
       ['Choisis un pseudo', 'Choisis un pseudo amusant et le pays que tu veux représenter. Pas d’e-mail ni de vrai nom : on te propose même un pseudo.'],
@@ -252,6 +253,7 @@ const fr = {
     h1: 'Championnat du monde — 60 secondes',
     lead: 'Manche officielle : multiplications de 2 à 12, une par une, pendant exactement 60 secondes. Ton meilleur score du mois compte au classement mondial.',
     soon: 'Le championnat officiel ouvre très bientôt. En attendant, échauffe-toi en mode entraînement !',
+    opensOn: 'Le premier championnat officiel commence le {date} (heure UTC). D’ici là, échauffe-toi en mode entraînement !',
     signupH: 'Crée ton profil joueur', signupP: 'Choisis un pseudo et le pays que tu veux représenter. C’est tout ce qu’il nous faut.',
     nickname: 'Pseudo', nickHelp: '3 à 16 lettres ou chiffres. N’utilise pas ton vrai nom.', suggest: 'Autre idée', country: 'Pays', countryHelp: 'Le drapeau affiché à côté de ton pseudo. Choisis librement.',
     under13: 'Tu as moins de 13 ans ? Demande à un parent ou à ton enseignant avant de créer un profil.',
@@ -272,7 +274,7 @@ const fr = {
     invalid: 'Cette partie n’a pas pu être validée (temps impossibles ou problème de connexion) : elle ne compte pas.',
     rankNow: 'Tu es n° {rank} en {month}.', again: 'Rejouer', seeBoard: 'Voir le classement',
     share: 'Partager mon score', shareText: 'J’ai marqué {n} points au Championnat du monde MathSheetLab. Sauras-tu me battre ?', shareDone: 'Image téléchargée et texte copié : colle-le où tu veux.',
-    errors: { nick_taken: 'Ce pseudo est déjà pris. Essaie-en un autre.', nick_offensive: 'Ce pseudo n’est pas autorisé. Choisis-en un sympathique.', nick_reserved: 'Ce pseudo est réservé. Choisis-en un autre.', nick_length: 'Utilise de 3 à 16 caractères.', nick_chars: 'Seulement des lettres, des chiffres, - et _ (pas d’espace).', nick_digits: 'Trop de chiffres : pas de dates, de numéros de téléphone ni de codes.', nick_mixed: 'Utilise un seul alphabet dans ton pseudo.', bad_country: 'Choisis un pays.', bad_code: 'Ce code de récupération n’est pas valide.', rate_limited: 'Trop de tentatives. Patiente un peu puis réessaie.', profile_cooldown: 'Tu pourras modifier ton profil dans quelques jours.', busy: 'Le championnat est très sollicité en ce moment. Réessaie dans quelques minutes.', generic: 'Une erreur est survenue. Réessaie.' }
+    errors: { nick_taken: 'Ce pseudo est déjà pris. Essaie-en un autre.', nick_offensive: 'Ce pseudo n’est pas autorisé. Choisis-en un sympathique.', nick_reserved: 'Ce pseudo est réservé. Choisis-en un autre.', nick_length: 'Utilise de 3 à 16 caractères.', nick_chars: 'Seulement des lettres, des chiffres, - et _ (pas d’espace).', nick_digits: 'Trop de chiffres : pas de dates, de numéros de téléphone ni de codes.', nick_mixed: 'Utilise un seul alphabet dans ton pseudo.', bad_country: 'Choisis un pays.', bad_code: 'Ce code de récupération n’est pas valide.', rate_limited: 'Trop de tentatives. Patiente un peu puis réessaie.', profile_cooldown: 'Tu pourras modifier ton profil dans quelques jours.', busy: 'Le championnat est très sollicité en ce moment. Réessaie dans quelques minutes.', not_open: 'Le championnat officiel n’a pas encore commencé.', generic: 'Une erreur est survenue. Réessaie.' }
   },
   practice: {
     h1: 'Entraînement aux tables de multiplication',
@@ -324,7 +326,7 @@ const ja = {
     lead: '制限時間は60秒。2の段から12の段まで。ランキングは世界でひとつ。何回でも挑戦でき、その月のベストスコアが記録されます。月末に1位の人が世界チャンピオンです。',
     join: '選手権に参加する', practice: 'まずは練習',
     facts: ['完全無料', 'メールも本名も不要', '全員が同じルール'],
-    liveTitle: '開催中の選手権', endsIn: '終了まで', playersGames: '参加者 {p}人・プレイ {g}回',
+    liveTitle: '開催中の選手権', endsIn: '終了まで', startsIn: '開始まで', playersGames: '参加者 {p}人・プレイ {g}回',
     stepsKicker: '遊び方', stepsH: '表彰台までの3ステップ',
     steps: [
       ['ニックネームを決める', '楽しいニックネームと、代表したい国・地域を選びます。メールアドレスも本名もいりません。ニックネームの候補も用意しています。'],
@@ -392,6 +394,7 @@ const ja = {
     h1: '世界選手権 — 60秒',
     lead: '公式ラウンド：2〜12のかけ算を1問ずつ、ちょうど60秒。その月のベストスコアが世界ランキングに記録されます。',
     soon: '公式選手権はまもなく始まります。それまで練習モードでウォーミングアップしよう！',
+    opensOn: '最初の公式選手権は{date}（UTC）に始まります。それまで練習モードでウォーミングアップしよう！',
     signupH: 'プロフィールを作ろう', signupP: 'ニックネームと代表する国・地域を選ぶだけです。',
     nickname: 'ニックネーム', nickHelp: '3〜16文字（文字と数字）。本名は使わないでください。', suggest: 'ほかの候補', country: '国・地域', countryHelp: 'ニックネームの横に表示される国旗です。自由に選べます。',
     under13: '13歳未満の人は、プロフィールを作る前におうちの人か先生に聞いてください。',
@@ -412,7 +415,7 @@ const ja = {
     invalid: 'このゲームは確認できなかったため（ありえないタイミング、または接続の問題）、記録されません。',
     rankNow: '{month}の順位は{rank}位です。', again: 'もう一度', seeBoard: 'ランキングを見る',
     share: 'スコアをシェア', shareText: 'MathSheetLab かけ算世界選手権で{n}点を取ったよ。きみはこえられる？', shareDone: '画像をダウンロードし、テキストをコピーしました。好きな場所に貼りつけてね。',
-    errors: { nick_taken: 'このニックネームはすでに使われています。別のものを試してください。', nick_offensive: 'このニックネームは使えません。みんなが気持ちよく見られる名前にしてください。', nick_reserved: 'このニックネームは予約されています。別のものを選んでください。', nick_length: '3〜16文字にしてください。', nick_chars: '使えるのは文字、数字、- と _ だけです（スペース不可）。', nick_digits: '数字が多すぎます。日付や電話番号、コードは使わないでください。', nick_mixed: 'ニックネームには1種類の文字（例：ローマ字だけ）を使ってください。', bad_country: '国・地域を選んでください。', bad_code: 'この復元コードは正しくありません。', rate_limited: '試行回数が多すぎます。少し待ってからもう一度お試しください。', profile_cooldown: '数日後にもう一度プロフィールを変更できます。', busy: '現在アクセスが集中しています。数分後にもう一度お試しください。', generic: 'エラーが発生しました。もう一度お試しください。' }
+    errors: { nick_taken: 'このニックネームはすでに使われています。別のものを試してください。', nick_offensive: 'このニックネームは使えません。みんなが気持ちよく見られる名前にしてください。', nick_reserved: 'このニックネームは予約されています。別のものを選んでください。', nick_length: '3〜16文字にしてください。', nick_chars: '使えるのは文字、数字、- と _ だけです（スペース不可）。', nick_digits: '数字が多すぎます。日付や電話番号、コードは使わないでください。', nick_mixed: 'ニックネームには1種類の文字（例：ローマ字だけ）を使ってください。', bad_country: '国・地域を選んでください。', bad_code: 'この復元コードは正しくありません。', rate_limited: '試行回数が多すぎます。少し待ってからもう一度お試しください。', profile_cooldown: '数日後にもう一度プロフィールを変更できます。', busy: '現在アクセスが集中しています。数分後にもう一度お試しください。', not_open: '公式選手権はまだ始まっていません。', generic: 'エラーが発生しました。もう一度お試しください。' }
   },
   practice: {
     h1: 'かけ算の練習',

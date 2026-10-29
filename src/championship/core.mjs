@@ -44,6 +44,8 @@ export function prevMonth(key) {
   const [y, m] = key.split('-').map(Number);
   return m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, '0')}`;
 }
+// First official month (UTC). Before it, only practice is open. Overridable with the CHAMPIONSHIP_FIRST_MONTH variable.
+export const FIRST_MONTH = '2026-12';
 export const isMonthKey = (s) => typeof s === 'string' && /^20\d\d-(0[1-9]|1[0-2])$/.test(s);
 // A month is closed once every game that started in it has certainly ended.
 export const CLOSE_DELAY_MS = RULES.countdownMs + RULES.durationMs + RULES.graceMs + 60000;
