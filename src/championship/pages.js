@@ -155,7 +155,7 @@ function clientData(lang, page, extra = {}) {
   const t = T[lang];
   const data = {
     page, lang,
-    t: { name: t.name, slogan: t.slogan, nav: t.nav, play: t.play, practice: t.practice, board: t.board, hall: t.hall, player: t.player, common: t.common, landing: { endsIn: t.landing.endsIn, playersGames: t.landing.playersGames }, home: t.home },
+    t: { name: t.name, slogan: t.slogan, nav: t.nav, play: t.play, practice: t.practice, board: t.board, hall: t.hall, player: t.player, common: t.common, landing: { endsIn: t.landing.endsIn, startsIn: t.landing.startsIn, playersGames: t.landing.playersGames }, home: t.home },
     links: Object.fromEntries(Object.keys(SUB).map((p) => [p, url(lang, p)])),
     privacy: '/privacy/#championship',
     countries: countries(lang),

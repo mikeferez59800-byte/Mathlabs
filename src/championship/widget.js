@@ -11,7 +11,8 @@
   };
   fetch('/api/championship/status', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (st) {
     if (!st || !st.month) return;
-    var p = st.month.split('-');
+    var upcoming = !!st.opensAt; // before the first official month
+    var p = (upcoming ? st.firstMonth : st.month).split('-');
     var month = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(+p[0], +p[1] - 1, 15)));
     var m = root.querySelector('[data-w-month]');
     if (m) m.textContent = month + ' Championship';
@@ -25,9 +26,9 @@
     var offset = st.serverNow - Date.now();
     var ends = root.querySelector('[data-w-ends]');
     var tick = function () {
-      var ms = Math.max(0, st.endsAt - (Date.now() + offset));
+      var ms = Math.max(0, (upcoming ? st.opensAt : st.endsAt) - (Date.now() + offset));
       var d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, mi = Math.floor(ms / 60000) % 60;
-      if (ends) ends.textContent = 'Ends in ' + (d ? d + ' d ' + h + ' h' : h + ' h ' + mi + ' min');
+      if (ends) ends.textContent = (upcoming ? 'Starts in ' : 'Ends in ') + (d ? d + ' d ' + h + ' h' : h + ' h ' + mi + ' min');
     };
     tick(); setInterval(tick, 30000);
     var pl = root.querySelector('[data-w-players]');

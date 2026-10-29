@@ -52,6 +52,7 @@ Je n'ai pas accès à votre compte Cloudflare, ces étapes sont donc pour vous. 
 
 ## 4. Règles officielles (résumé technique)
 
+- Premier mois officiel : **décembre 2026** (`FIRST_MONTH` dans `core.mjs`, ou variable `CHAMPIONSHIP_FIRST_MONTH` au format `AAAA-MM`). Avant, seul l'entraînement est ouvert et les pages affichent le compte à rebours jusqu'au 1er décembre 00:00 UTC.
 - 60 s exactement, après 3 s de compte à rebours, mesurées par le serveur.
 - Questions : toutes les multiplications de 2×2 à 12×12 (121 faits), en paquets mélangés : chaque fait sort une fois avant toute répétition, jamais deux fois de suite (ni a×b juste après b×a).
 - 1 point par bonne réponse, 0 par mauvaise. Une mauvaise réponse garde la même question ; après 2 erreurs la réponse est affichée et doit être recopiée (0 point). Il est donc impossible de « sauter » une question difficile.

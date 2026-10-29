@@ -12,8 +12,7 @@
 import {
   RULES, CLOSE_DELAY_MS, monthKey, monthStart, monthEnd, isMonthKey, isCountry,
   questionsWindow, applyEvents, initialState, verdict, isBetter,
-  checkNickname, cleanNickname, nicknameKey, suggestNickname, formatRecoveryCode, normalizeRecoveryCode, TEAM_SIZE
-} from './core.mjs';
+  checkNickname, cleanNickname, nicknameKey, suggestNickname, formatRecoveryCode, normalizeRecoveryCode, TEAM_SIZE, FIRST_MONTH } from './core.mjs';
 import { BLOCKLIST } from './blocklist.mjs';
 import { MIGRATIONS, SCHEMA_VERSION } from './schema.mjs';
 
@@ -294,6 +293,7 @@ async function startGame(c) {
   const startsAt = c.now + RULES.countdownMs;
   const endsAt = startsAt + RULES.durationMs;
   const month = monthKey(startsAt);
+  if (month < c.firstMonth) fail(403, 'not_open');
   await c.db.prepare(`INSERT INTO game_sessions (id, player_id, month, seed, created_at, starts_at, ends_at, seq, state, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'active')`).bind(id, p.id, month, seed, c.now, startsAt, endsAt, JSON.stringify(initialState())).run();
   return json({
@@ -600,7 +600,8 @@ async function status(c) {
       lastChampion: last ? { month: last.month, ...publicRow(last, 1) } : null
     };
   });
-  return json({ ...data, serverNow: c.now, durationMs: RULES.durationMs });
+  const opensAt = month < c.firstMonth ? monthStart(c.firstMonth) : null;
+  return json({ ...data, opensAt, firstMonth: c.firstMonth, serverNow: c.now, durationMs: RULES.durationMs });
 }
 
 async function rankIn(c, table, month, b) {
@@ -771,7 +772,8 @@ export async function handle(request, env, ctx) {
   const path = url.pathname.replace(/^\/api\/championship\/?/, '').replace(/\/+$/, '');
   const method = request.method.toUpperCase();
   if (!env || !env.DB) return json({ error: 'not_configured' }, 503);
-  const c = { request, env, ctx, db: env.DB, url, method, now: typeof env.__now === 'function' ? env.__now() : Date.now() };
+  const c = { request, env, ctx, db: env.DB, url, method, now: typeof env.__now === 'function' ? env.__now() : Date.now(),
+    firstMonth: isMonthKey(env.CHAMPIONSHIP_FIRST_MONTH) ? env.CHAMPIONSHIP_FIRST_MONTH : FIRST_MONTH };
   try {
     if (method !== 'GET' && method !== 'HEAD') {
       // Same-site only: refuses requests sent by other websites with the player's cookie.
