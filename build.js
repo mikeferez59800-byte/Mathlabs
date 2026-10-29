@@ -17,6 +17,7 @@ const LAYOUT = require('./src/layout');
 const { explain } = require('./src/explain');
 const CHAMP = require('./src/championship/pages');
 const { T: CT } = require('./src/championship/i18n');
+const { kukuPage, KUKU_PATH } = require('./src/kuku-ja');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
@@ -208,7 +209,7 @@ function footer(lang = 'en') {
 <div class="foot-brand"><a class="logo" href="/">${LOGO('lg-f')}<span>MathSheet<b>Lab</b></span></a><p>${lang === 'en' ? `${esc(config.tagline)}. Answer keys included, no sign-up.` : esc(ch.tagline)}</p></div>
 ${cols}
 ${CHAMP.footerColumn(lang)}
-<div><h2>${esc(ch.footSite)}</h2><ul><li><a href="/about/">${esc(ch.about)}</a></li><li><a href="/contact/">${esc(ch.contact)}</a></li><li><a href="/privacy/">${esc(ch.privacy)}</a></li><li><a href="/terms/">${esc(ch.terms)}</a></li><li><a href="/legal/">${esc(ch.legal)}</a></li>${privacyBtn}</ul></div>
+<div><h2>${esc(ch.footSite)}</h2><ul>${lang === 'ja' ? `<li><a href="${KUKU_PATH}">九九ゲーム</a></li>` : ''}<li><a href="/about/">${esc(ch.about)}</a></li><li><a href="/contact/">${esc(ch.contact)}</a></li><li><a href="/privacy/">${esc(ch.privacy)}</a></li><li><a href="/terms/">${esc(ch.terms)}</a></li><li><a href="/legal/">${esc(ch.legal)}</a></li>${privacyBtn}</ul></div>
 <p class="foot-note">${esc(ch.footNote)} © ${new Date().getFullYear()} ${esc(config.name)}.</p>
 </div></footer>`;
 }
@@ -609,6 +610,8 @@ function main() {
     write(e.p + 'index.html', e.html);
     if (e.index) entries.push({ p: e.p, html: e.html });
   }
+  const kuku = kukuPage({ assets, layout, esc, crumbs, abs, ICON });
+  add(kuku.p, kuku.html);
   const legal = staticPages(assets);
   for (const p of legal) entries.push({ p, html: fs.readFileSync(path.join(DIST, p, 'index.html'), 'utf8') });
   write('/404.html', notFoundPage(assets));
